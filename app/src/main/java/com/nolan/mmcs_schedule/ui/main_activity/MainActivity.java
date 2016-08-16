@@ -1,10 +1,10 @@
-package com.nolan.mmcs_schedule.ui;
+package com.nolan.mmcs_schedule.ui.main_activity;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 
-import com.nolan.mmcs_schedule.PickScheduleTypeFragment;
+import com.nolan.mmcs_schedule.ui.PickScheduleTypeFragment;
 
 public class MainActivity extends AppCompatActivity {
     @Override

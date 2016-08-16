@@ -1,4 +1,4 @@
-package com.nolan.mmcs_schedule;
+package com.nolan.mmcs_schedule.ui;
 
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -8,6 +8,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.RadioGroup;
+
+import com.nolan.mmcs_schedule.R;
 
 public class PickScheduleTypeFragment extends Fragment {
 

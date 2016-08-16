@@ -9,7 +9,7 @@
         android:theme="@style/AppTheme"
         android:name=".ScheduleApplication">
 
-        <activity android:name=".ui.MainActivity">
+        <activity android:name=".ui.main_activity.MainActivity">
 
             <intent-filter>
 
