@@ -33,10 +33,10 @@ public class PickScheduleTypeFragment extends Fragment {
         RadioGroup rg = (RadioGroup) view.findViewById(R.id.rg);
         rg.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
             @Override
-            public void onCheckedChanged(RadioGroup radioGroup, int i) {
+            public void onCheckedChanged(RadioGroup radioGroup, int id) {
                 if (scheduleTypePickedListener == null)
                     return;
-                switch (radioGroup.getId()) {
+                switch (id) {
                     case R.id.rb_student:
                         scheduleTypePickedListener.onStudent();
                         break;
