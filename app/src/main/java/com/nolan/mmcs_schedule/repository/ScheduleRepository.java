@@ -7,59 +7,65 @@ import com.nolan.mmcs_schedule.repository.primitives.GroupSchedule;
 import com.nolan.mmcs_schedule.repository.primitives.Teacher;
 import com.nolan.mmcs_schedule.repository.primitives.TeacherSchedule;
 import com.octo.android.robospice.SpiceManager;
-import com.octo.android.robospice.persistence.exception.SpiceException;
 import com.octo.android.robospice.request.listener.RequestListener;
 import com.octo.android.robospice.request.retrofit.RetrofitSpiceRequest;
 
-import java.util.ArrayList;
-
 public class ScheduleRepository {
-
-    public interface ResponseListener<T> {
-        void onResponse(T response);
-        void onError(Throwable error);
-    }
 
     private SpiceManager spiceManager;
 
-    private ScheduleRepository(SpiceManager spiceManager) {
+    public ScheduleRepository(SpiceManager spiceManager) {
         this.spiceManager = spiceManager;
     }
 
-    public void getGrades(final ResponseListener<Grade.List> listener) {
+    public void getGrades(final RequestListener<Grade.List> listener) {
         spiceManager.execute(new RetrofitSpiceRequest<Grade.List, ScheduleApi>(
                 Grade.List.class, ScheduleApi.class) {
             @Override
             public Grade.List loadDataFromNetwork() throws Exception {
                 return new Grade.List(getService().getGrades());
             }
-        }, new RequestListener<Grade.List>() {
+        }, listener);
+    }
+
+    public void getGroups(final int gradeId, final int gradeNum, RequestListener<Group.List> listener) {
+        spiceManager.execute(new RetrofitSpiceRequest<Group.List, ScheduleApi>(
+                Group.List.class, ScheduleApi.class) {
             @Override
-            public void onRequestFailure(SpiceException spiceException) {
-                listener.onError(spiceException);
+            public Group.List loadDataFromNetwork() throws Exception {
+                return new Group.List(getService().getGroups(gradeId), gradeNum);
             }
+        }, listener);
+    }
 
+    public void getTeachers(RequestListener<Teacher.List> listener) {
+        spiceManager.execute(new RetrofitSpiceRequest<Teacher.List, ScheduleApi>(
+                Teacher.List.class, ScheduleApi.class) {
             @Override
-            public void onRequestSuccess(Grade.List grades) {
-                listener.onResponse(grades);
+            public Teacher.List loadDataFromNetwork() throws Exception {
+                return new Teacher.List(getService().getTeachers());
             }
-        });
+        }, listener);
     }
 
-    public void getGroups(Grade grade, ResponseListener<ArrayList<Group>> lisneter) {
-        // todo: implement
+    public void getScheduleOfGroup(final int groupId, RequestListener<GroupSchedule> listener) {
+        spiceManager.execute(new RetrofitSpiceRequest<GroupSchedule, ScheduleApi>(
+                GroupSchedule.class, ScheduleApi.class) {
+            @Override
+            public GroupSchedule loadDataFromNetwork() throws Exception {
+                return new GroupSchedule(getService().getScheduleOfGroup(groupId));
+            }
+        }, listener);
     }
 
-    public void getTeachers(ResponseListener<ArrayList<Teacher>> listener) {
-        // todo: implement
-    }
-
-    public void getSchedule(Group group, ResponseListener<ArrayList<GroupSchedule>> listener) {
-        // todo: implement
-    }
-
-    public void getSchedule(Teacher teacher, ResponseListener<ArrayList<TeacherSchedule>> listener) {
-        // todo: implement
+    public void getScheduleOfTeacher(final int teacherId, RequestListener<TeacherSchedule> listener) {
+        spiceManager.execute(new RetrofitSpiceRequest<TeacherSchedule, ScheduleApi>(
+                TeacherSchedule.class, ScheduleApi.class) {
+            @Override
+            public TeacherSchedule loadDataFromNetwork() throws Exception {
+                return new TeacherSchedule(getService().getScheduleOfTeacher(teacherId));
+            }
+        }, listener);
     }
 }
 

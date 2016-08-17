@@ -17,7 +17,7 @@
             android:name=".repository.api.RetrofitSpiceService"
             android:exported="false" />
 
-        <activity android:name=".ui.main_activity.MainActivity">
+        <activity android:name=".ui.MainActivity">
 
             <intent-filter>
 
