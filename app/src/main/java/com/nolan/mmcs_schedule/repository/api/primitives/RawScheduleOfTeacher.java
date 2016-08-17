@@ -8,7 +8,7 @@ public class RawScheduleOfTeacher
 
     private List<RawLesson>        lessons   = null;
     private List<RawCurriculum>    curricula = null;
-    private List<RawGroupOfLesson> groups = null;
+    private List<RawGroupOfLesson> groups    = null;
 
     public RawScheduleOfTeacher(List<RawLesson> lessons, List<RawCurriculum> curricula,
                                 List<RawGroupOfLesson> groups) {
