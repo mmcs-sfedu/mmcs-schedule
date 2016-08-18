@@ -7,10 +7,14 @@ import java.util.ArrayList;
 public class Group {
     public final int id;
     public final String name;
+    public final int num;
+    public final int gradeNum;
 
     public Group(RawGroup group, int gradeNum) {
         this.id = group.getId();
-        this.name = group.getName() + " " + gradeNum + "." + group.getNum();
+        this.name = group.getName();
+        this.num = group.getNum();
+        this.gradeNum = gradeNum;
     }
 
     @Override

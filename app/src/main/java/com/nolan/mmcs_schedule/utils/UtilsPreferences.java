@@ -15,7 +15,7 @@ public class UtilsPreferences {
     }
 
     /**
-     * Have user made choice of schedule?
+     * Has user made choice of schedule?
      */
     private static final String KEY_SCHEDULE_WAS_PICKED = "schedule-was-picked";
     public boolean getScheduleWasPicked() {
@@ -32,7 +32,7 @@ public class UtilsPreferences {
      * Was schedule of student picked or schedule of teacher?
      */
     private static final String KEY_SCHEDULE_OF_STUDENT = "schedule-of-student";
-    public boolean getScheduleOfStudent() {
+    public boolean getGroupSchedule() {
         return getPreferences().getBoolean(KEY_SCHEDULE_OF_STUDENT, true);
     }
     public void setScheduleOfStudent(boolean scheduleOfStudent) {
@@ -43,7 +43,7 @@ public class UtilsPreferences {
     }
 
     /**
-     * Id of the grade that user picked. This value must be correct if getScheduleOfStudent()
+     * Id of the grade that user picked. This value must be correct if getGroupSchedule()
      * returns true.
      */
     private static final String KEY_GRADE_ID = "group-id";
@@ -58,7 +58,7 @@ public class UtilsPreferences {
     }
 
     /**
-     * Id of the group that user picked. This value must be correct if getScheduleOfStudent()
+     * Id of the group that user picked. This value must be correct if getGroupSchedule()
      * returns true.
      */
     private static final String KEY_GROUP_ID = "group-id";
@@ -73,14 +73,14 @@ public class UtilsPreferences {
     }
 
     /**
-     * Id of the teacher that user picked. This value must be correct if getScheduleOfStudent()
+     * Id of the teacher that user picked. This value must be correct if getGroupSchedule()
      * returns false.
      */
     private static final String KEY_TEACHER_ID = "teacher-id";
     public long getTeacherId() {
         return getPreferences().getLong(KEY_TEACHER_ID, -1);
     }
-    public void getTeacherId(long id) {
+    public void setTeacherId(long id) {
         getPreferences()
                 .edit()
                 .putLong(KEY_TEACHER_ID, id)

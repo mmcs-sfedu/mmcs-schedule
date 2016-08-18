@@ -4,9 +4,15 @@ import com.nolan.mmcs_schedule.repository.api.primitives.RawGrade;
 
 import java.util.ArrayList;
 
-public class Grade extends RawGrade {
+public class Grade {
+    public final int id;
+    public final int num;
+    public final RawGrade.Degree degree;
+
     public Grade(RawGrade rawGrade) {
-        super(rawGrade.getId(), rawGrade.getNum(), rawGrade.getDegree());
+        id = rawGrade.getId();
+        num = rawGrade.getNum();
+        degree = rawGrade.getDegree();
     }
 
     public static class List extends ArrayList<Grade> {
@@ -17,4 +23,6 @@ public class Grade extends RawGrade {
             }
         }
     }
+
+
 }
