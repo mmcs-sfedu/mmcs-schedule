@@ -131,9 +131,9 @@ public class MainActivity extends BaseActivity implements MainPresenter.View {
         protected String str(Grade grade) {
             String result;
             switch (grade.degree) {
-                case BACHELOR:   result = "Бакалавравриат ";   break;
-                case MASTER:     result = "Магистратура ";    break;
-                case SPECIALIST: result = "Специалитет "; break;
+                case BACHELOR:   result = "Бакалавриат ";  break;
+                case MASTER:     result = "Магистратура "; break;
+                case SPECIALIST: result = "Специалитет ";  break;
                 default:
                     throw new Error("unreachable statement");
             }
