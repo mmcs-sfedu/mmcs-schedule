@@ -30,34 +30,19 @@ public class UtilsPreferences {
     /**
      * Was schedule of student picked or schedule of teacher?
      */
-    private static final String KEY_SCHEDULE_OF_STUDENT = "schedule-of-student";
-    public boolean getGroupSchedule() {
+    private static final String KEY_SCHEDULE_OF_STUDENT = "schedule-of-group";
+    public boolean getPickedScheduleOfGroup() {
         return getPreferences().getBoolean(KEY_SCHEDULE_OF_STUDENT, true);
     }
-    public void setScheduleOfStudent(boolean scheduleOfStudent) {
+    public void setPickedScheduleOfGroup(boolean scheduleOfGroup) {
         getPreferences()
                 .edit()
-                .putBoolean(KEY_SCHEDULE_OF_STUDENT, scheduleOfStudent)
+                .putBoolean(KEY_SCHEDULE_OF_STUDENT, scheduleOfGroup)
                 .apply();
     }
 
     /**
-     * Id of the grade that user picked. This value must be correct if getGroupSchedule()
-     * returns true.
-     */
-    private static final String KEY_GRADE_ID = "group-id";
-    public int getGradeId() {
-        return getPreferences().getInt(KEY_GRADE_ID, -1);
-    }
-    public void setGradeId(int id) {
-        getPreferences()
-                .edit()
-                .putInt(KEY_GRADE_ID, id)
-                .apply();
-    }
-
-    /**
-     * Id of the group that user picked. This value must be correct if getGroupSchedule()
+     * Id of the group that user picked. This value must be correct if getPickedScheduleOfGroup()
      * returns true.
      */
     private static final String KEY_GROUP_ID = "group-id";
@@ -72,7 +57,7 @@ public class UtilsPreferences {
     }
 
     /**
-     * Id of the teacher that user picked. This value must be correct if getGroupSchedule()
+     * Id of the teacher that user picked. This value must be correct if getPickedScheduleOfGroup()
      * returns false.
      */
     private static final String KEY_TEACHER_ID = "teacher-id";

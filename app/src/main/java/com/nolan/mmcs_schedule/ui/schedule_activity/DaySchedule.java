@@ -1,4 +1,4 @@
-package com.nolan.mmcs_schedule.ui;
+package com.nolan.mmcs_schedule.ui.schedule_activity;
 
 import java.util.ArrayList;
 
@@ -10,4 +10,6 @@ public class DaySchedule {
         this.dayOfWeek = dayOfWeek;
         this.lessons = lessons;
     }
+
+    public static class List extends ArrayList<DaySchedule> { }
 }

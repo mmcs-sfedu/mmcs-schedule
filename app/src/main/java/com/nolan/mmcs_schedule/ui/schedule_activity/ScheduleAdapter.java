@@ -1,4 +1,4 @@
-package com.nolan.mmcs_schedule.ui;
+package com.nolan.mmcs_schedule.ui.schedule_activity;
 
 import android.view.LayoutInflater;
 import android.view.View;
@@ -10,29 +10,7 @@ import com.nolan.mmcs_schedule.R;
 
 import java.util.ArrayList;
 
-public class ScheduleAdapter extends BaseAdapter {
-    private ArrayList<DaySchedule> schedule;
-
-    public ScheduleAdapter(ArrayList<DaySchedule> schedule) {
-        super();
-        this.schedule = schedule;
-    }
-
-    @Override
-    public int getCount() {
-        return schedule.size();
-    }
-
-    @Override
-    public DaySchedule getItem(int i) {
-        return schedule.get(i);
-    }
-
-    @Override
-    public long getItemId(int i) {
-        return -1;
-    }
-
+public class ScheduleAdapter extends CustomArrayAdapter<DaySchedule> {
     private static class LessonViewHolder {
         public final View self;
         public final TextView tvBeginTime;
@@ -98,7 +76,7 @@ public class ScheduleAdapter extends BaseAdapter {
         if (dayViewHolder == null) {
             dayViewHolder = (DayViewHolder) view.getTag();
         }
-        DaySchedule daySchedule = schedule.get(i);
+        DaySchedule daySchedule = getItem(i);
         dayViewHolder.tvDayOfWeek.setText(daySchedule.dayOfWeek);
         int j = 0;
         for (; j < daySchedule.lessons.size(); ++j) {

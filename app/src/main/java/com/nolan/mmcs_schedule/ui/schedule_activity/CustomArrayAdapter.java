@@ -1,4 +1,4 @@
-package com.nolan.mmcs_schedule.ui;
+package com.nolan.mmcs_schedule.ui.schedule_activity;
 
 import android.view.LayoutInflater;
 import android.view.View;

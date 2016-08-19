@@ -1,4 +1,4 @@
-package com.nolan.mmcs_schedule.ui;
+package com.nolan.mmcs_schedule.ui.schedule_activity;
 
 public class Lesson {
     public final String beginTime;

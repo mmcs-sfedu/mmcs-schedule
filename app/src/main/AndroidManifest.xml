@@ -17,7 +17,7 @@
             android:name=".repository.api.RetrofitSpiceService"
             android:exported="false" />
 
-        <activity android:name=".ui.MainActivity">
+        <activity android:name=".ui.initial_activity.InitialActivity">
 
             <intent-filter>
 
@@ -28,6 +28,10 @@
             </intent-filter>
 
         </activity>
+
+        <activity android:name=".ui.pick_schedule_activity.PickScheduleActivity" />
+
+        <activity android:name=".ui.schedule_activity.ScheduleActivity" />
 
     </application>
 
