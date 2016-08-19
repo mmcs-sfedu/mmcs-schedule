@@ -19,7 +19,11 @@ public class Group {
 
     @Override
     public String toString() {
-        return name;
+        if ("NULL".equals(name)) {
+            return num + " группа";
+        } else {
+            return name + " " + num + " группа";
+        }
     }
 
     public static class List extends ArrayList<Group> {

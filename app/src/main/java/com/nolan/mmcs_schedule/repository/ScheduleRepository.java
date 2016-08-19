@@ -43,7 +43,11 @@ public class ScheduleRepository {
                 Teacher.List.class, ScheduleApi.class) {
             @Override
             public Teacher.List loadDataFromNetwork() throws Exception {
-                return new Teacher.List(getService().getTeachers());
+                Teacher.List result = new Teacher.List(getService().getTeachers());
+                if (result.get(0).name.isEmpty()) {
+                    result.remove(0);
+                }
+                return result;
             }
         }, listener);
     }

@@ -1,9 +1,15 @@
 package com.nolan.mmcs_schedule.ui;
 
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
+import android.util.DisplayMetrics;
+import android.util.TypedValue;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -18,6 +24,7 @@ import android.widget.Toast;
 
 import com.nolan.mmcs_schedule.Injector;
 import com.nolan.mmcs_schedule.R;
+import com.nolan.mmcs_schedule.repository.ScheduleRepository;
 import com.nolan.mmcs_schedule.repository.primitives.Grade;
 import com.nolan.mmcs_schedule.repository.primitives.Group;
 import com.nolan.mmcs_schedule.repository.primitives.GroupLesson;
@@ -25,6 +32,7 @@ import com.nolan.mmcs_schedule.repository.primitives.GroupSchedule;
 import com.nolan.mmcs_schedule.repository.primitives.Teacher;
 import com.nolan.mmcs_schedule.repository.primitives.TeacherLesson;
 import com.nolan.mmcs_schedule.repository.primitives.TeacherSchedule;
+import com.nolan.mmcs_schedule.repository.primitives.WeekType;
 import com.nolan.mmcs_schedule.utils.UtilsPreferences;
 import com.octo.android.robospice.persistence.exception.SpiceException;
 import com.octo.android.robospice.request.listener.RequestListener;
@@ -41,14 +49,32 @@ public class MainActivity extends BaseActivity implements MainPresenter.View {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         llContent = (LinearLayout) findViewById(R.id.content);
+
         preferences = Injector.injectPreferences();
-        presenter = new MainPresenter(this, Injector.injectRepository(this), preferences);
+        ScheduleRepository repository = Injector.injectRepository(this);
+
+        presenter = new MainPresenter(this, repository, preferences);
         presenter.start();
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.main_menu, menu);
+        menu.findItem(R.id.mi_another_schedule)
+                .setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+                    @Override
+                    public boolean onMenuItemClick(MenuItem menuItem) {
+                        onPickAnotherScheduleListener.onPickAnotherSchedule();
+                        return true;
+                    }
+                });
+        return true;
     }
 
     private MainPresenter.OnScheduleTypePickedListener onScheduleTypePickedListener;
     private MainPresenter.OnGroupPickedListener onGroupPickedListener;
     private MainPresenter.OnTeacherPickedListener onTeacherPickedListener;
+    private MainPresenter.OnPickAnotherScheduleListener onPickAnotherScheduleListener;
 
     @Override
     public void setOnScheduleTypePickedListener(MainPresenter.OnScheduleTypePickedListener listener) {
@@ -66,7 +92,13 @@ public class MainActivity extends BaseActivity implements MainPresenter.View {
     }
 
     @Override
+    public void setOnPickAnotherScheduleListener(MainPresenter.OnPickAnotherScheduleListener listener) {
+        onPickAnotherScheduleListener = listener;
+    }
+
+    @Override
     public void showScheduleTypeOptions() {
+        setTitle("Расписание мехмата");
         llContent.removeAllViews();
         LayoutInflater inflater = LayoutInflater.from(this);
         RadioGroup view = (RadioGroup) inflater.inflate(R.layout.pick_schedule_type, llContent, false);
@@ -99,9 +131,9 @@ public class MainActivity extends BaseActivity implements MainPresenter.View {
         protected String str(Grade grade) {
             String result;
             switch (grade.degree) {
-                case BACHELOR:   result = "Бакалавры ";   break;
-                case MASTER:     result = "Магистры ";    break;
-                case SPECIALIST: result = "Специалисты "; break;
+                case BACHELOR:   result = "Бакалавравриат ";   break;
+                case MASTER:     result = "Магистратура ";    break;
+                case SPECIALIST: result = "Специалитет "; break;
                 default:
                     throw new Error("unreachable statement");
             }
@@ -115,15 +147,6 @@ public class MainActivity extends BaseActivity implements MainPresenter.View {
         @Override
         protected long id(Group group) {
             return group.id;
-        }
-
-        @Override
-        protected String str(Group group) {
-            if ("NULL".equals(group.name)) {
-                return group.num + " группа";
-            } else {
-                return group.name + " " + group.num + " группа";
-            }
         }
     }
 
@@ -258,6 +281,7 @@ public class MainActivity extends BaseActivity implements MainPresenter.View {
     @Override
     public void showGroupSchedule() {
         llContent.removeAllViews();
+        setTitle(preferences.getTitle());
         ProgressBar progressBar = new ProgressBar(this);
         FrameLayout.LayoutParams layoutParams = new FrameLayout.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT,
@@ -287,38 +311,53 @@ public class MainActivity extends BaseActivity implements MainPresenter.View {
             "Пятница", "Суббота", "Воскресенье"
     };
 
+    private static String str(WeekType weekType) {
+        switch (weekType) {
+            case UPPER: return "верхняя неделя";
+            case LOWER: return "нижняя неделя";
+            case FULL: return "";
+        }
+        throw new Error("unreachable statement");
+    }
+
+    private ListView createListForSchedule(ArrayList<DaySchedule> schedule) {
+        ListView listView = new ListView(this);
+        FrameLayout.LayoutParams layoutParams = new FrameLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.MATCH_PARENT);
+        listView.setScrollBarStyle(ListView.SCROLLBARS_OUTSIDE_OVERLAY);
+        listView.setPadding(dip(16), dip(16), dip(16), dip(16));
+        listView.setClipToPadding(false);
+        listView.setLayoutParams(layoutParams);
+        listView.setDivider(new ColorDrawable(Color.TRANSPARENT));
+        listView.setDividerHeight(dip(16));
+        listView.setAdapter(new ScheduleAdapter(schedule));
+        return listView;
+    }
+
     private View inflateGroupSchedule(GroupSchedule groupSchedule) {
         ArrayList<DaySchedule> schedule = new ArrayList<>();
         for (int i = 0; i < 6; ++i) {
             ArrayList<Lesson> lessons = new ArrayList<>();
-            for (int j = 0; j < 6; ++j) {
-                GroupLesson lesson = groupSchedule.lessons[i][j];
-                if (lesson == null)
-                    continue;
+            for (GroupLesson lesson : groupSchedule.lessons.get(i)) {
                 lessons.add(new Lesson(
                         lesson.period.begin.toString(),
                         lesson.period.end.toString(),
                         lesson.subjectName,
-                        lesson.room,
-                        lesson.teacher,
-                        lesson.weekType.toString()));
+                        TextUtils.join(", ", lesson.rooms),
+                        TextUtils.join("\n", lesson.teachers),
+                        str(lesson.weekType)));
             }
             if (lessons.isEmpty())
                 continue;
             schedule.add(new DaySchedule(DAYS_OF_WEEK[i], lessons));
         }
-
-        ListView listView = new ListView(this);
-        FrameLayout.LayoutParams layoutParams = new FrameLayout.LayoutParams(
-                ViewGroup.LayoutParams.MATCH_PARENT,
-                ViewGroup.LayoutParams.MATCH_PARENT);
-        listView.setLayoutParams(layoutParams);
-        listView.setAdapter(new ScheduleAdapter(schedule));
-        return listView;
+        return createListForSchedule(schedule);
     }
 
     @Override
     public void showTeacherSchedule() {
+        setTitle(preferences.getTitle());
         llContent.removeAllViews();
         ProgressBar progressBar = new ProgressBar(this);
         FrameLayout.LayoutParams layoutParams = new FrameLayout.LayoutParams(
@@ -327,8 +366,8 @@ public class MainActivity extends BaseActivity implements MainPresenter.View {
         progressBar.setIndeterminate(true);
         progressBar.setLayoutParams(layoutParams);
         llContent.addView(progressBar);
-        int groupId = preferences.getGroupId();
-        presenter.getScheduleOfTeacher(groupId, new RequestListener<TeacherSchedule>() {
+        int teacherId = preferences.getTeacherId();
+        presenter.getScheduleOfTeacher(teacherId, new RequestListener<TeacherSchedule>() {
             @Override
             public void onRequestFailure(SpiceException spiceException) {
                 Toast.makeText(MainActivity.this,
@@ -344,33 +383,28 @@ public class MainActivity extends BaseActivity implements MainPresenter.View {
         });
     }
 
+    private int dip(int n) {
+        return (int) TypedValue.applyDimension(
+                TypedValue.COMPLEX_UNIT_DIP, n, getResources().getDisplayMetrics());
+    }
+
     private View inflateTeacherSchedule(TeacherSchedule teacherSchedule) {
         ArrayList<DaySchedule> schedule = new ArrayList<>();
         for (int i = 0; i < 6; ++i) {
             ArrayList<Lesson> lessons = new ArrayList<>();
-            for (int j = 0; j < 6; ++j) {
-                TeacherLesson lesson = teacherSchedule.lessons[i][j];
-                if (lesson == null)
-                    continue;
+            for (TeacherLesson lesson : teacherSchedule.lessons.get(i)) {
                 lessons.add(new Lesson(
                         lesson.period.begin.toString(),
                         lesson.period.end.toString(),
                         lesson.subjectName,
                         lesson.room,
                         TextUtils.join(", ", lesson.groups),
-                        lesson.weekType.toString()));
+                        str(lesson.weekType)));
             }
             if (lessons.isEmpty())
                 continue;
             schedule.add(new DaySchedule(DAYS_OF_WEEK[i], lessons));
         }
-
-        ListView listView = new ListView(this);
-        FrameLayout.LayoutParams layoutParams = new FrameLayout.LayoutParams(
-                ViewGroup.LayoutParams.MATCH_PARENT,
-                ViewGroup.LayoutParams.MATCH_PARENT);
-        listView.setLayoutParams(layoutParams);
-        listView.setAdapter(new ScheduleAdapter(schedule));
-        return listView;
+        return createListForSchedule(schedule);
     }
 }

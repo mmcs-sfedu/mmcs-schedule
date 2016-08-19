@@ -3,7 +3,7 @@ package com.nolan.mmcs_schedule.repository.primitives;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-class LessonTime {
+public class LessonTime {
     public final LessonPeriod period;
     public final int dayOfWeek;
     public final WeekType weekType;

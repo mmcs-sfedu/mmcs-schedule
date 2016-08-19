@@ -1,38 +1,92 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
+<FrameLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <TextView
-        android:id="@+id/tv_begin_time"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
 
-    <TextView
-        android:id="@+id/tv_end_time"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
+        <LinearLayout
+            android:id="@+id/ll_period"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:layout_marginLeft="8dp"
+            android:orientation="vertical">
 
-    <TextView
-        android:id="@+id/tv_primary_text"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
+            <TextView
+                android:id="@+id/tv_begin_time"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:lines="1"
+                android:textAppearance="@android:style/TextAppearance.DeviceDefault.Medium"
+                tools:text="09:50" />
 
-    <TextView
-        android:id="@+id/tv_secondary_text"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
+            <TextView
+                android:id="@+id/tv_end_time"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:lines="1"
+                android:textAppearance="@android:style/TextAppearance.DeviceDefault.Medium"
+                tools:text="11:25" />
 
-    <TextView
-        android:id="@+id/tv_tertiary_text"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
+        </LinearLayout>
 
-    <TextView
-        android:id="@+id/tv_week_type"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
+        <View
+            android:id="@+id/divider"
+            android:layout_width="1dp"
+            android:layout_height="match_parent"
+            android:layout_marginLeft="8dp"
+            android:layout_marginRight="8dp"
+            android:background="@android:color/darker_gray" />
 
-</LinearLayout>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_marginBottom="8dp">
+
+            <TextView
+                android:id="@+id/tv_primary_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:textStyle="bold"
+                tools:text="Программирование" />
+
+            <TextView
+                android:id="@+id/tv_tertiary_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                tools:text="Михалкович С.С." />
+
+            <TextView
+                android:id="@+id/tv_secondary_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                tools:text="а.301" />
+
+            <TextView
+                android:id="@+id/tv_week_type"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                tools:text="FULL" />
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+    <View
+        android:id="@+id/v_bottom_divider"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_gravity="bottom"
+        android:background="@android:color/darker_gray" />
+
+</FrameLayout>

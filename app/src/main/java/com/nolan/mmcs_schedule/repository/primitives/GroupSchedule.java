@@ -4,43 +4,53 @@ import com.nolan.mmcs_schedule.repository.api.primitives.RawCurriculum;
 import com.nolan.mmcs_schedule.repository.api.primitives.RawLesson;
 import com.nolan.mmcs_schedule.repository.api.primitives.RawScheduleOfGroup;
 
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.TreeMap;
+import java.util.TreeSet;
 
 public class GroupSchedule {
-    // first index means day of week(0..6)
-    // second index means ordinal number of lesson(0..6)
-    public final GroupLesson[][] lessons;
+    public final ArrayList<TreeSet<GroupLesson>> lessons;
 
     public GroupSchedule(RawScheduleOfGroup rawScheduleOfGroup) {
-        TreeMap<Integer, LessonTime> idToLessonInfo = new TreeMap<>();
-        for (RawLesson rawLesson : rawScheduleOfGroup.getLessons()) {
-            idToLessonInfo.put(rawLesson.getId(), new LessonTime(rawLesson.getTimeSlot()));
-        }
-
-        lessons = new GroupLesson[6][];
-        for (int i = 0; i < 6; ++i) {
-            lessons[i] = new GroupLesson[6];
-        }
+        TreeMap<Integer, ArrayList<RawCurriculum>> lessonIdToCurricula = new TreeMap<>();
         for (RawCurriculum rawCurriculum : rawScheduleOfGroup.getCurricula()) {
-            LessonPeriod period = idToLessonInfo.get(rawCurriculum.getLessonId()).period;
-            WeekType weekType = idToLessonInfo.get(rawCurriculum.getLessonId()).weekType;
-            String subjectName = rawCurriculum.getSubjectName();
-            String teacher = rawCurriculum.getTeacherName();
-            String room = rawCurriculum.getRoomName();
-            int dayOfWeek = idToLessonInfo.get(rawCurriculum.getLessonId()).dayOfWeek;
-            int lessonNumber;
-            // It looks awful but I don't see any other way to find ordinal number of lesson.
-            switch (period.begin.hour) {
-                case 8: lessonNumber = 0; break;
-                case 9: lessonNumber = 1; break;
-                case 11: lessonNumber = 2; break;
-                case 13: lessonNumber = 3; break;
-                case 15: lessonNumber = 4; break;
-                case 18: lessonNumber = 5; break;
-                default: throw new Error("Illegal lesson begin time.");
+            int lessonId = rawCurriculum.getLessonId();
+            ArrayList<RawCurriculum> curricula = lessonIdToCurricula.get(lessonId);
+            if (curricula == null) {
+                curricula = new ArrayList<>();
+                lessonIdToCurricula.put(lessonId, curricula);
             }
-            lessons[dayOfWeek][lessonNumber] =
-                    new GroupLesson(period, weekType, subjectName, teacher, room);
+            curricula.add(rawCurriculum);
+        }
+        lessons = new ArrayList<>(6);
+        Comparator<GroupLesson> comparator = new Comparator<GroupLesson>() {
+            @Override
+            public int compare(GroupLesson lhs, GroupLesson rhs) {
+                return lhs.period.begin.hour > rhs.period.begin.hour ? 1 : -1;
+            }
+        };
+        for (int i = 0; i < 6; ++i) {
+            lessons.add(new TreeSet<>(comparator));
+        }
+        for (RawLesson rawLesson : rawScheduleOfGroup.getLessons()) {
+            LessonTime lessonTime = new LessonTime(rawLesson.getTimeSlot());
+            ArrayList<RawCurriculum> curricula = lessonIdToCurricula.get(rawLesson.getId());
+            LessonPeriod period = lessonTime.period;
+            WeekType weekType = lessonTime.weekType;
+            String subjectName = curricula.get(0).getSubjectName();
+            TreeSet<String> teachers = new TreeSet<>();
+            ArrayList<String> rooms = new ArrayList<>();
+            for (RawCurriculum curriculum : curricula) {
+                teachers.add(curriculum.getTeacherName());
+                String roomName = curriculum.getRoomName();
+                if (!roomName.isEmpty()) {
+                    rooms.add("а." + roomName);
+                }
+            }
+            int dayOfWeek = lessonTime.dayOfWeek;
+            lessons.get(dayOfWeek).add(new GroupLesson(
+                    period, weekType, subjectName, teachers, rooms));
         }
     }
 

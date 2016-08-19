@@ -13,6 +13,6 @@ public class HourMinute {
 
     @Override
     public String toString() {
-        return "" + hour + ":" + minute;
+        return String.format("%1$02d:%2$02d", hour, minute);
     }
 }

@@ -1,6 +1,6 @@
 package com.nolan.mmcs_schedule.ui;
 
-class Lesson {
+public class Lesson {
     public final String beginTime;
     public final String endTime;
     public final String primaryText;

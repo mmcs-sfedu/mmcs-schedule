@@ -2,7 +2,7 @@ package com.nolan.mmcs_schedule.ui;
 
 import java.util.ArrayList;
 
-class DaySchedule {
+public class DaySchedule {
     public final String dayOfWeek;
     public final ArrayList<Lesson> lessons;
 

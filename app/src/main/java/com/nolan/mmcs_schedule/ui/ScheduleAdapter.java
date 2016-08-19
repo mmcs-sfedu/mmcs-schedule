@@ -10,7 +10,7 @@ import com.nolan.mmcs_schedule.R;
 
 import java.util.ArrayList;
 
-class ScheduleAdapter extends BaseAdapter {
+public class ScheduleAdapter extends BaseAdapter {
     private ArrayList<DaySchedule> schedule;
 
     public ScheduleAdapter(ArrayList<DaySchedule> schedule) {
@@ -41,6 +41,7 @@ class ScheduleAdapter extends BaseAdapter {
         public final TextView tvSecondaryText;
         public final TextView tvTertiaryText;
         public final TextView tvWeekType;
+        public final View vBottomDivider;
 
         public LessonViewHolder(View view) {
             this.self = view;
@@ -50,6 +51,7 @@ class ScheduleAdapter extends BaseAdapter {
             this.tvSecondaryText = (TextView) view.findViewById(R.id.tv_secondary_text);
             this.tvTertiaryText = (TextView) view.findViewById(R.id.tv_tertiary_text);
             this.tvWeekType = (TextView) view.findViewById(R.id.tv_week_type);
+            this.vBottomDivider = view.findViewById(R.id.v_bottom_divider);
         }
     }
 
@@ -59,13 +61,28 @@ class ScheduleAdapter extends BaseAdapter {
 
         public DayViewHolder(View view) {
             this.tvDayOfWeek = (TextView) view.findViewById(R.id.tv_day_of_week);
-            this.lessons = new LessonViewHolder[6];
+            this.lessons = new LessonViewHolder[12];
             this.lessons[0] = new LessonViewHolder(view.findViewById(R.id.lesson_0));
             this.lessons[1] = new LessonViewHolder(view.findViewById(R.id.lesson_1));
             this.lessons[2] = new LessonViewHolder(view.findViewById(R.id.lesson_2));
             this.lessons[3] = new LessonViewHolder(view.findViewById(R.id.lesson_3));
             this.lessons[4] = new LessonViewHolder(view.findViewById(R.id.lesson_4));
             this.lessons[5] = new LessonViewHolder(view.findViewById(R.id.lesson_5));
+            this.lessons[6] = new LessonViewHolder(view.findViewById(R.id.lesson_6));
+            this.lessons[7] = new LessonViewHolder(view.findViewById(R.id.lesson_7));
+            this.lessons[8] = new LessonViewHolder(view.findViewById(R.id.lesson_8));
+            this.lessons[9] = new LessonViewHolder(view.findViewById(R.id.lesson_9));
+            this.lessons[10] = new LessonViewHolder(view.findViewById(R.id.lesson_10));
+            this.lessons[11] = new LessonViewHolder(view.findViewById(R.id.lesson_11));
+        }
+    }
+
+    private void setTextAndSetVisibility(TextView textView, String text) {
+        textView.setText(text);
+        if (text.isEmpty()) {
+            textView.setVisibility(View.GONE);
+        } else {
+            textView.setVisibility(View.VISIBLE);
         }
     }
 
@@ -85,15 +102,19 @@ class ScheduleAdapter extends BaseAdapter {
         dayViewHolder.tvDayOfWeek.setText(daySchedule.dayOfWeek);
         int j = 0;
         for (; j < daySchedule.lessons.size(); ++j) {
-            dayViewHolder.lessons[j].self.setVisibility(View.VISIBLE);
-            dayViewHolder.lessons[j].tvBeginTime.setText(daySchedule.lessons.get(j).beginTime);
-            dayViewHolder.lessons[j].tvEndTime.setText(daySchedule.lessons.get(j).endTime);
-            dayViewHolder.lessons[j].tvPrimaryText.setText(daySchedule.lessons.get(j).primaryText);
-            dayViewHolder.lessons[j].tvSecondaryText.setText(daySchedule.lessons.get(j).secondaryText);
-            dayViewHolder.lessons[j].tvTertiaryText.setText(daySchedule.lessons.get(j).tertiaryText);
-            dayViewHolder.lessons[j].tvWeekType.setText(daySchedule.lessons.get(j).weekType);
+            LessonViewHolder lessonViewHolder = dayViewHolder.lessons[j];
+            Lesson lesson = daySchedule.lessons.get(j);
+            lessonViewHolder.self.setVisibility(View.VISIBLE);
+            lessonViewHolder.tvBeginTime.setText(lesson.beginTime);
+            lessonViewHolder.tvEndTime.setText(lesson.endTime);
+            lessonViewHolder.tvPrimaryText.setText(lesson.primaryText);
+            setTextAndSetVisibility(lessonViewHolder.tvSecondaryText, lesson.secondaryText);
+            setTextAndSetVisibility(lessonViewHolder.tvTertiaryText, lesson.tertiaryText);
+            setTextAndSetVisibility(lessonViewHolder.tvWeekType, lesson.weekType);
+            lessonViewHolder.vBottomDivider.setVisibility(View.VISIBLE);
         }
-        for (; j < 6; ++j) {
+        dayViewHolder.lessons[j - 1].vBottomDivider.setVisibility(View.GONE);
+        for (; j < 12; ++j) {
             dayViewHolder.lessons[j].self.setVisibility(View.GONE);
         }
         return view;

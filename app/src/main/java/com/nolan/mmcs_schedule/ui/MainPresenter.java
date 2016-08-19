@@ -25,10 +25,15 @@ public class MainPresenter {
         void onTeacherPicked(Teacher teacher);
     }
 
+    public interface OnPickAnotherScheduleListener {
+        void onPickAnotherSchedule();
+    }
+
     public interface View {
         void setOnScheduleTypePickedListener(OnScheduleTypePickedListener listener);
         void setOnGroupPickedListener(OnGroupPickedListener listener);
         void setOnTeacherPickedListener(OnTeacherPickedListener listener);
+        void setOnPickAnotherScheduleListener(OnPickAnotherScheduleListener listener);
         void showScheduleTypeOptions();
         void showStudentOptions();
         void showTeacherOptions();
@@ -45,6 +50,11 @@ public class MainPresenter {
         this.view = new WeakReference<>(view);
         this.repository = repository;
         this.preferences = preferences;
+    }
+
+    public void rebindView(View view) {
+        this.view = new WeakReference<>(view);
+        registerListeners();
     }
 
     public void start() {
@@ -87,6 +97,11 @@ public class MainPresenter {
                 preferences.setScheduleOfStudent(true);
                 preferences.setGradeId(grade.id);
                 preferences.setGroupId(group.id);
+                if ("NULL".equals(group.name)) {
+                    preferences.setTitle(group.num + " группа");
+                } else {
+                    preferences.setTitle(group.name + " " + group.num + " группа");
+                }
                 v.showGroupSchedule();
             }
         });
@@ -98,7 +113,17 @@ public class MainPresenter {
                 preferences.setScheduleWasPicked(true);
                 preferences.setScheduleOfStudent(false);
                 preferences.setTeacherId(teacher.id);
+                preferences.setTitle(teacher.name);
                 v.showTeacherSchedule();
+            }
+        });
+        view.get().setOnPickAnotherScheduleListener(new OnPickAnotherScheduleListener() {
+            @Override
+            public void onPickAnotherSchedule() {
+                View v = view.get();
+                if (v == null) return;
+                preferences.setScheduleWasPicked(false);
+                v.showScheduleTypeOptions();
             }
         });
     }

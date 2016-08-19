@@ -86,4 +86,19 @@ public class UtilsPreferences {
                 .apply();
     }
 
+    /**
+     * String that will be shown in action bar. It should contain name of the teacher
+     * or group identifier.
+     */
+    private static final String KEY_TITLE = "title";
+    public String getTitle() {
+        return getPreferences().getString(KEY_TITLE, "");
+    }
+    public void setTitle(String title) {
+        getPreferences()
+                .edit()
+                .putString(KEY_TITLE, title)
+                .apply();
+    }
+
 }
