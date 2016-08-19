@@ -148,6 +148,15 @@ public class MainActivity extends BaseActivity implements MainPresenter.View {
         protected long id(Group group) {
             return group.id;
         }
+
+        @Override
+        protected String str(Group group) {
+            if ("NULL".equals(group.name)) {
+                return "" + group.num + " группа";
+            } else {
+                return group.name + " " + group.num;
+            }
+        }
     }
 
     private Grade pickedGrade;

@@ -98,9 +98,9 @@ public class MainPresenter {
                 preferences.setGradeId(grade.id);
                 preferences.setGroupId(group.id);
                 if ("NULL".equals(group.name)) {
-                    preferences.setTitle(group.num + " группа");
+                    preferences.setTitle("Группа " + group.gradeNum + "." + group.num);
                 } else {
-                    preferences.setTitle(group.name + " " + group.num + " группа");
+                    preferences.setTitle("Группа " + group.name + " " + group.gradeNum + "." + group.num);
                 }
                 v.showGroupSchedule();
             }

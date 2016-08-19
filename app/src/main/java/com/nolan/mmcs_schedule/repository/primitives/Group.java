@@ -17,15 +17,6 @@ public class Group {
         this.gradeNum = gradeNum;
     }
 
-    @Override
-    public String toString() {
-        if ("NULL".equals(name)) {
-            return num + " группа";
-        } else {
-            return name + " " + num + " группа";
-        }
-    }
-
     public static class List extends ArrayList<Group> {
         public List(ArrayList<RawGroup> rawGroups, int gradeNum) {
             ensureCapacity(rawGroups.size());
