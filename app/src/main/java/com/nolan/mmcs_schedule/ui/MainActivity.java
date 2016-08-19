@@ -2,33 +2,47 @@ package com.nolan.mmcs_schedule.ui;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.Button;
+import android.widget.FrameLayout;
 import android.widget.LinearLayout;
+import android.widget.ListView;
+import android.widget.ProgressBar;
 import android.widget.RadioGroup;
 import android.widget.Spinner;
 import android.widget.Toast;
 
+import com.nolan.mmcs_schedule.Injector;
 import com.nolan.mmcs_schedule.R;
 import com.nolan.mmcs_schedule.repository.primitives.Grade;
 import com.nolan.mmcs_schedule.repository.primitives.Group;
+import com.nolan.mmcs_schedule.repository.primitives.GroupLesson;
+import com.nolan.mmcs_schedule.repository.primitives.GroupSchedule;
 import com.nolan.mmcs_schedule.repository.primitives.Teacher;
+import com.nolan.mmcs_schedule.repository.primitives.TeacherLesson;
+import com.nolan.mmcs_schedule.repository.primitives.TeacherSchedule;
 import com.nolan.mmcs_schedule.utils.UtilsPreferences;
 import com.octo.android.robospice.persistence.exception.SpiceException;
 import com.octo.android.robospice.request.listener.RequestListener;
 
+import java.util.ArrayList;
+
 public class MainActivity extends BaseActivity implements MainPresenter.View {
     private LinearLayout llContent;
     private MainPresenter presenter;
+    private UtilsPreferences preferences;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         llContent = (LinearLayout) findViewById(R.id.content);
-        presenter = new MainPresenter(this, getScheduleRepository(), new UtilsPreferences());
+        preferences = Injector.injectPreferences();
+        presenter = new MainPresenter(this, Injector.injectRepository(this), preferences);
         presenter.start();
     }
 
@@ -243,15 +257,120 @@ public class MainActivity extends BaseActivity implements MainPresenter.View {
 
     @Override
     public void showGroupSchedule() {
-        Toast.makeText(MainActivity.this,
-                "showGroupSchedule()",
-                Toast.LENGTH_LONG).show();
+        llContent.removeAllViews();
+        ProgressBar progressBar = new ProgressBar(this);
+        FrameLayout.LayoutParams layoutParams = new FrameLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.MATCH_PARENT);
+        progressBar.setIndeterminate(true);
+        progressBar.setLayoutParams(layoutParams);
+        llContent.addView(progressBar);
+        int groupId = preferences.getGroupId();
+        presenter.getScheduleOfGroup(groupId, new RequestListener<GroupSchedule>() {
+            @Override
+            public void onRequestFailure(SpiceException spiceException) {
+                Toast.makeText(MainActivity.this,
+                        "При загрузке расписания произошла ошибка",
+                        Toast.LENGTH_LONG).show();
+            }
+
+            @Override
+            public void onRequestSuccess(GroupSchedule groupSchedule) {
+                llContent.removeAllViews();
+                llContent.addView(inflateGroupSchedule(groupSchedule));
+            }
+        });
+    }
+
+    private static final String[] DAYS_OF_WEEK = new String[] {
+            "Понедельник", "Вторник", "Среда", "Четверг",
+            "Пятница", "Суббота", "Воскресенье"
+    };
+
+    private View inflateGroupSchedule(GroupSchedule groupSchedule) {
+        ArrayList<DaySchedule> schedule = new ArrayList<>();
+        for (int i = 0; i < 6; ++i) {
+            ArrayList<Lesson> lessons = new ArrayList<>();
+            for (int j = 0; j < 6; ++j) {
+                GroupLesson lesson = groupSchedule.lessons[i][j];
+                if (lesson == null)
+                    continue;
+                lessons.add(new Lesson(
+                        lesson.period.begin.toString(),
+                        lesson.period.end.toString(),
+                        lesson.subjectName,
+                        lesson.room,
+                        lesson.teacher,
+                        lesson.weekType.toString()));
+            }
+            if (lessons.isEmpty())
+                continue;
+            schedule.add(new DaySchedule(DAYS_OF_WEEK[i], lessons));
+        }
+
+        ListView listView = new ListView(this);
+        FrameLayout.LayoutParams layoutParams = new FrameLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.MATCH_PARENT);
+        listView.setLayoutParams(layoutParams);
+        listView.setAdapter(new ScheduleAdapter(schedule));
+        return listView;
     }
 
     @Override
     public void showTeacherSchedule() {
-        Toast.makeText(MainActivity.this,
-                "showTeacherSchedule()",
-                Toast.LENGTH_LONG).show();
+        llContent.removeAllViews();
+        ProgressBar progressBar = new ProgressBar(this);
+        FrameLayout.LayoutParams layoutParams = new FrameLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.MATCH_PARENT);
+        progressBar.setIndeterminate(true);
+        progressBar.setLayoutParams(layoutParams);
+        llContent.addView(progressBar);
+        int groupId = preferences.getGroupId();
+        presenter.getScheduleOfTeacher(groupId, new RequestListener<TeacherSchedule>() {
+            @Override
+            public void onRequestFailure(SpiceException spiceException) {
+                Toast.makeText(MainActivity.this,
+                        "При загрузке расписания произошла ошибка",
+                        Toast.LENGTH_LONG).show();
+            }
+
+            @Override
+            public void onRequestSuccess(TeacherSchedule teacherSchedule) {
+                llContent.removeAllViews();
+                llContent.addView(inflateTeacherSchedule(teacherSchedule));
+            }
+        });
+    }
+
+    private View inflateTeacherSchedule(TeacherSchedule teacherSchedule) {
+        ArrayList<DaySchedule> schedule = new ArrayList<>();
+        for (int i = 0; i < 6; ++i) {
+            ArrayList<Lesson> lessons = new ArrayList<>();
+            for (int j = 0; j < 6; ++j) {
+                TeacherLesson lesson = teacherSchedule.lessons[i][j];
+                if (lesson == null)
+                    continue;
+                lessons.add(new Lesson(
+                        lesson.period.begin.toString(),
+                        lesson.period.end.toString(),
+                        lesson.subjectName,
+                        lesson.room,
+                        TextUtils.join(", ", lesson.groups),
+                        lesson.weekType.toString()));
+            }
+            if (lessons.isEmpty())
+                continue;
+            schedule.add(new DaySchedule(DAYS_OF_WEEK[i], lessons));
+        }
+
+        ListView listView = new ListView(this);
+        FrameLayout.LayoutParams layoutParams = new FrameLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.MATCH_PARENT);
+        listView.setLayoutParams(layoutParams);
+        listView.setAdapter(new ScheduleAdapter(schedule));
+        return listView;
     }
 }

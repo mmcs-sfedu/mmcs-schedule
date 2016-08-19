@@ -10,4 +10,9 @@ public class HourMinute {
         this.hour = hour;
         this.minute = minute;
     }
+
+    @Override
+    public String toString() {
+        return "" + hour + ":" + minute;
+    }
 }

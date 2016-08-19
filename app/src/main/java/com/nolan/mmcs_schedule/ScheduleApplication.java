@@ -6,7 +6,6 @@ public class ScheduleApplication extends Application{
 
     private static ScheduleApplication context;
 
-
     @Override
     public void onCreate() {
         super.onCreate();

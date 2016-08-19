@@ -115,11 +115,11 @@ public class MainPresenter {
         repository.getGroups(grade.id, grade.num, listener);
     }
 
-    public void getScheduleOfTeacher(Teacher teacher, RequestListener<TeacherSchedule> listener) {
-        repository.getScheduleOfTeacher(teacher.id, listener);
+    public void getScheduleOfTeacher(int teacherId, RequestListener<TeacherSchedule> listener) {
+        repository.getScheduleOfTeacher(teacherId, listener);
     }
 
-    public void getScheduleOfGroup(Group group, RequestListener<GroupSchedule> listener) {
-        repository.getScheduleOfGroup(group.id, listener);
+    public void getScheduleOfGroup(int groupId, RequestListener<GroupSchedule> listener) {
+        repository.getScheduleOfGroup(groupId, listener);
     }
 }

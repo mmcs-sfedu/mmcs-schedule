@@ -9,7 +9,6 @@ import com.nolan.mmcs_schedule.ScheduleApplication;
  * Class that presents access to shared preferences.
  */
 public class UtilsPreferences {
-
     private static SharedPreferences getPreferences() {
         return ScheduleApplication.get().getSharedPreferences("preferences", Context.MODE_PRIVATE);
     }
@@ -47,13 +46,13 @@ public class UtilsPreferences {
      * returns true.
      */
     private static final String KEY_GRADE_ID = "group-id";
-    public long getGradeId() {
-        return getPreferences().getLong(KEY_GRADE_ID, -1);
+    public int getGradeId() {
+        return getPreferences().getInt(KEY_GRADE_ID, -1);
     }
-    public void setGradeId(long id) {
+    public void setGradeId(int id) {
         getPreferences()
                 .edit()
-                .putLong(KEY_GRADE_ID, id)
+                .putInt(KEY_GRADE_ID, id)
                 .apply();
     }
 
@@ -62,13 +61,13 @@ public class UtilsPreferences {
      * returns true.
      */
     private static final String KEY_GROUP_ID = "group-id";
-    public long getGroupId() {
-        return getPreferences().getLong(KEY_GROUP_ID, -1);
+    public int getGroupId() {
+        return getPreferences().getInt(KEY_GROUP_ID, -1);
     }
-    public void setGroupId(long id) {
+    public void setGroupId(int id) {
         getPreferences()
                 .edit()
-                .putLong(KEY_GROUP_ID, id)
+                .putInt(KEY_GROUP_ID, id)
                 .apply();
     }
 
@@ -77,13 +76,13 @@ public class UtilsPreferences {
      * returns false.
      */
     private static final String KEY_TEACHER_ID = "teacher-id";
-    public long getTeacherId() {
-        return getPreferences().getLong(KEY_TEACHER_ID, -1);
+    public int getTeacherId() {
+        return getPreferences().getInt(KEY_TEACHER_ID, -1);
     }
-    public void setTeacherId(long id) {
+    public void setTeacherId(int id) {
         getPreferences()
                 .edit()
-                .putLong(KEY_TEACHER_ID, id)
+                .putInt(KEY_TEACHER_ID, id)
                 .apply();
     }
 
