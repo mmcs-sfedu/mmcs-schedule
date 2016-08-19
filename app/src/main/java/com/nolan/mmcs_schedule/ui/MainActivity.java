@@ -278,17 +278,15 @@ public class MainActivity extends BaseActivity implements MainPresenter.View {
         });
     }
 
+    private void showLoading() {
+        LayoutInflater.from(this).inflate(R.layout.loading, llContent);
+    }
+
     @Override
     public void showGroupSchedule() {
         llContent.removeAllViews();
         setTitle(preferences.getTitle());
-        ProgressBar progressBar = new ProgressBar(this);
-        FrameLayout.LayoutParams layoutParams = new FrameLayout.LayoutParams(
-                ViewGroup.LayoutParams.MATCH_PARENT,
-                ViewGroup.LayoutParams.MATCH_PARENT);
-        progressBar.setIndeterminate(true);
-        progressBar.setLayoutParams(layoutParams);
-        llContent.addView(progressBar);
+        showLoading();
         int groupId = preferences.getGroupId();
         presenter.getScheduleOfGroup(groupId, new RequestListener<GroupSchedule>() {
             @Override
@@ -359,13 +357,7 @@ public class MainActivity extends BaseActivity implements MainPresenter.View {
     public void showTeacherSchedule() {
         setTitle(preferences.getTitle());
         llContent.removeAllViews();
-        ProgressBar progressBar = new ProgressBar(this);
-        FrameLayout.LayoutParams layoutParams = new FrameLayout.LayoutParams(
-                ViewGroup.LayoutParams.MATCH_PARENT,
-                ViewGroup.LayoutParams.MATCH_PARENT);
-        progressBar.setIndeterminate(true);
-        progressBar.setLayoutParams(layoutParams);
-        llContent.addView(progressBar);
+        showLoading();
         int teacherId = preferences.getTeacherId();
         presenter.getScheduleOfTeacher(teacherId, new RequestListener<TeacherSchedule>() {
             @Override
