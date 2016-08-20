@@ -18,11 +18,7 @@ public class InitialActivity extends AppCompatActivity {
         if (!preferences.getScheduleWasPicked()) {
             startActivity(new Intent(this, PickScheduleActivity.class));
         } else {
-            if (preferences.getPickedScheduleOfGroup()) {
-                ScheduleActivity.start(this, false, preferences.getTeacherId());
-            } else {
-                ScheduleActivity.start(this, true, preferences.getGroupId());
-            }
+            ScheduleActivity.start(this);
         }
         finish();
     }

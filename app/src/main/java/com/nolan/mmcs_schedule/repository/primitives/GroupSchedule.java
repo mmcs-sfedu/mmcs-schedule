@@ -34,8 +34,9 @@ public class GroupSchedule {
             lessons.add(new TreeSet<>(comparator));
         }
         for (RawLesson rawLesson : rawScheduleOfGroup.getLessons()) {
-            LessonTime lessonTime = new LessonTime(rawLesson.getTimeSlot());
             ArrayList<RawCurriculum> curricula = lessonIdToCurricula.get(rawLesson.getId());
+            if (curricula == null) continue;
+            LessonTime lessonTime = new LessonTime(rawLesson.getTimeSlot());
             LessonPeriod period = lessonTime.period;
             WeekType weekType = lessonTime.weekType;
             String subjectName = curricula.get(0).getSubjectName();

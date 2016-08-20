@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Button;
@@ -84,6 +85,7 @@ public class PickScheduleActivity extends BaseActivity implements PickSchedulePr
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_pick_schedule);
 
         ScheduleRepository repository = Injector.injectRepository(this);
         preferences = Injector.injectPreferences();
@@ -101,6 +103,13 @@ public class PickScheduleActivity extends BaseActivity implements PickSchedulePr
         spTeacher.setAdapter(teacherAdapter);
         spGrade.setAdapter(gradeAdapter);
         spGroup.setAdapter(groupAdapter);
+
+        showStudentOptions();
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
 
         rgScheduleType.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
             @Override
@@ -225,8 +234,8 @@ public class PickScheduleActivity extends BaseActivity implements PickSchedulePr
     }
 
     @Override
-    public void startScheduleActivity(boolean scheduleOfGroup, int id) {
-        ScheduleActivity.start(this, scheduleOfGroup, id);
+    public void startScheduleActivity() {
+        ScheduleActivity.start(this);
         finish();
     }
 }

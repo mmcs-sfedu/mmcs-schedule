@@ -48,37 +48,9 @@ public class SchedulePresenter {
             "Пятница", "Суббота", "Воскресенье"
     };
 
-    public void getSchedule(boolean scheduleOfTeacher, int id,
+    public void getSchedule(boolean pickedScheduleOfGroup, int id,
                             final RequestListener<DaySchedule.List> listener) {
-        if (scheduleOfTeacher) {
-            repository.getScheduleOfTeacher(id, new RequestListener<TeacherSchedule>() {
-                @Override
-                public void onRequestFailure(SpiceException spiceException) {
-                    listener.onRequestFailure(spiceException);
-                }
-
-                @Override
-                public void onRequestSuccess(TeacherSchedule teacherSchedule) {
-                    DaySchedule.List schedule = new DaySchedule.List();
-                    for (int i = 0; i < 6; ++i) {
-                        ArrayList<Lesson> lessons = new ArrayList<>();
-                        for (TeacherLesson lesson : teacherSchedule.lessons.get(i)) {
-                            lessons.add(new Lesson(
-                                    lesson.period.begin.toString(),
-                                    lesson.period.end.toString(),
-                                    lesson.subjectName,
-                                    lesson.room,
-                                    TextUtils.join(", ", lesson.groups),
-                                    str(lesson.weekType)));
-                        }
-                        if (lessons.isEmpty())
-                            continue;
-                        schedule.add(new DaySchedule(DAYS_OF_WEEK[i], lessons));
-                    }
-                    listener.onRequestSuccess(schedule);
-                }
-            });
-        } else {
+        if (pickedScheduleOfGroup) {
             repository.getScheduleOfGroup(id, new RequestListener<GroupSchedule>() {
                 @Override
                 public void onRequestFailure(SpiceException spiceException) {
@@ -97,6 +69,34 @@ public class SchedulePresenter {
                                     lesson.subjectName,
                                     TextUtils.join(", ", lesson.rooms),
                                     TextUtils.join("\n", lesson.teachers),
+                                    str(lesson.weekType)));
+                        }
+                        if (lessons.isEmpty())
+                            continue;
+                        schedule.add(new DaySchedule(DAYS_OF_WEEK[i], lessons));
+                    }
+                    listener.onRequestSuccess(schedule);
+                }
+            });
+        } else {
+            repository.getScheduleOfTeacher(id, new RequestListener<TeacherSchedule>() {
+                @Override
+                public void onRequestFailure(SpiceException spiceException) {
+                    listener.onRequestFailure(spiceException);
+                }
+
+                @Override
+                public void onRequestSuccess(TeacherSchedule teacherSchedule) {
+                    DaySchedule.List schedule = new DaySchedule.List();
+                    for (int i = 0; i < 6; ++i) {
+                        ArrayList<Lesson> lessons = new ArrayList<>();
+                        for (TeacherLesson lesson : teacherSchedule.lessons.get(i)) {
+                            lessons.add(new Lesson(
+                                    lesson.period.begin.toString(),
+                                    lesson.period.end.toString(),
+                                    lesson.subjectName,
+                                    lesson.room,
+                                    TextUtils.join(", ", lesson.groups),
                                     str(lesson.weekType)));
                         }
                         if (lessons.isEmpty())

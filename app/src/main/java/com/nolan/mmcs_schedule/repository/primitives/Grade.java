@@ -15,14 +15,5 @@ public class Grade {
         degree = rawGrade.getDegree();
     }
 
-    public static class List extends ArrayList<Grade> {
-        public List(RawGrade.List rawList) {
-            ensureCapacity(rawList.size());
-            for (RawGrade grade : rawList) {
-                add(new Grade(grade));
-            }
-        }
-    }
-
-
+    public static class List extends ArrayList<Grade> { }
 }

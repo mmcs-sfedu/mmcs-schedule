@@ -17,12 +17,5 @@ public class Group {
         this.gradeNum = gradeNum;
     }
 
-    public static class List extends ArrayList<Group> {
-        public List(ArrayList<RawGroup> rawGroups, int gradeNum) {
-            ensureCapacity(rawGroups.size());
-            for (RawGroup rawGroup : rawGroups) {
-                add(new Group(rawGroup, gradeNum));
-            }
-        }
-    }
+    public static class List extends ArrayList<Group> { }
 }

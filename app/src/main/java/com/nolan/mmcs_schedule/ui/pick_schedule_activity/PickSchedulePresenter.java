@@ -9,7 +9,7 @@ import com.octo.android.robospice.request.listener.RequestListener;
 
 public class PickSchedulePresenter {
     public interface View {
-        void startScheduleActivity(boolean scheduleOfGroup, int id);
+        void startScheduleActivity();
     }
 
     private View view;
@@ -18,6 +18,7 @@ public class PickSchedulePresenter {
 
     private boolean pickedScheduleOfGroup;
     private int scheduleId;
+    private String title;
 
     public PickSchedulePresenter(View view, ScheduleRepository repository,
                                  UtilsPreferences preferences) {
@@ -29,11 +30,17 @@ public class PickSchedulePresenter {
     public void onPickTeacher(Teacher teacher) {
         pickedScheduleOfGroup = false;
         scheduleId = teacher.id;
+        title = teacher.name;
     }
 
     public void onPickGroup(Group group) {
         pickedScheduleOfGroup = true;
         scheduleId = group.id;
+        if ("NULL".equals(group.name)) {
+            title = "Группа " + group.gradeNum + "." + group.num;
+        } else {
+            title = "Группа " + group.name + " " + group.gradeNum + "." + group.num;
+        }
     }
 
     public void onOk() {
@@ -44,7 +51,8 @@ public class PickSchedulePresenter {
         } else {
             preferences.setTeacherId(scheduleId);
         }
-        view.startScheduleActivity(pickedScheduleOfGroup, scheduleId);
+        preferences.setTitle(title);
+        view.startScheduleActivity();
     }
 
     public void getTeachers(RequestListener<Teacher.List> listener) {
