@@ -36,7 +36,7 @@ public class PickSchedulePresenter {
     public void onPickGroup(Group group) {
         pickedScheduleOfGroup = true;
         scheduleId = group.id;
-        if ("NULL".equals(group.name)) {
+        if (group.name == null) {
             title = "Группа " + group.gradeNum + "." + group.num;
         } else {
             title = "Группа " + group.name + " " + group.gradeNum + "." + group.num;

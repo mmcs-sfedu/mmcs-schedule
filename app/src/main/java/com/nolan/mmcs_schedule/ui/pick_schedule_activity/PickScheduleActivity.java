@@ -4,7 +4,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Button;
@@ -20,52 +19,12 @@ import com.nolan.mmcs_schedule.repository.primitives.Grade;
 import com.nolan.mmcs_schedule.repository.primitives.Group;
 import com.nolan.mmcs_schedule.repository.primitives.Teacher;
 import com.nolan.mmcs_schedule.ui.BaseActivity;
-import com.nolan.mmcs_schedule.ui.schedule_activity.CustomArrayAdapter;
 import com.nolan.mmcs_schedule.ui.schedule_activity.ScheduleActivity;
 import com.nolan.mmcs_schedule.utils.UtilsPreferences;
 import com.octo.android.robospice.persistence.exception.SpiceException;
 import com.octo.android.robospice.request.listener.RequestListener;
 
 public class PickScheduleActivity extends BaseActivity implements PickSchedulePresenter.View {
-    private static class GradeAdapter extends CustomArrayAdapter<Grade> {
-        @Override
-        protected String str(Grade grade) {
-            String result;
-            switch (grade.degree) {
-                case BACHELOR:   result = "Бакалавриат ";  break;
-                case MASTER:     result = "Магистратура "; break;
-                case SPECIALIST: result = "Специалитет ";  break;
-                default:
-                    throw new Error("unreachable statement");
-            }
-            result += grade.num;
-            result += " курс";
-            return result;
-        }
-    }
-
-    public static void start(Context context) {
-        context.startActivity(new Intent(context, PickScheduleActivity.class));
-    }
-
-    private static class GroupAdapter extends CustomArrayAdapter<Group> {
-        @Override
-        protected String str(Group group) {
-            if ("NULL".equals(group.name)) {
-                return "" + group.num + " группа";
-            } else {
-                return group.name + " " + group.num;
-            }
-        }
-    }
-
-    private static class TeacherAdapter extends CustomArrayAdapter<Teacher> {
-        @Override
-        protected String str(Teacher teacher) {
-            return teacher.name;
-        }
-    }
-
     private PickSchedulePresenter presenter;
     private UtilsPreferences preferences;
 
@@ -80,7 +39,9 @@ public class PickScheduleActivity extends BaseActivity implements PickSchedulePr
     private Spinner spGroup;
     private Button btnOk;
 
-    private int groupId;
+    public static void start(Context context) {
+        context.startActivity(new Intent(context, PickScheduleActivity.class));
+    }
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -104,7 +65,7 @@ public class PickScheduleActivity extends BaseActivity implements PickSchedulePr
         spGrade.setAdapter(gradeAdapter);
         spGroup.setAdapter(groupAdapter);
 
-        showStudentOptions();
+        showGradeOption();
     }
 
     @Override
@@ -121,6 +82,32 @@ public class PickScheduleActivity extends BaseActivity implements PickSchedulePr
                         throw new Error("unreachable statement");
                 }
             }
+        });
+
+        spGrade.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+                showGradeOption();
+                Grade grade = gradeAdapter.getItem(i);
+                presenter.getGroups(grade.id, grade.num, new RequestListener<Group.List>() {
+                    @Override
+                    public void onRequestFailure(SpiceException spiceException) {
+                        Toast.makeText(
+                                PickScheduleActivity.this,
+                                "Ошибка при загрузке списка групп",
+                                Toast.LENGTH_LONG).show();
+                    }
+
+                    @Override
+                    public void onRequestSuccess(Group.List groups) {
+                        showGroupOption();
+                        groupAdapter.setData(groups);
+                    }
+                });
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> adapterView) { }
         });
 
         spGroup.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
@@ -153,11 +140,14 @@ public class PickScheduleActivity extends BaseActivity implements PickSchedulePr
         });
         btnOk.setEnabled(false);
 
-        onShowStudentOptions();
+        switch (rgScheduleType.getCheckedRadioButtonId()) {
+            case R.id.rb_student: onShowStudentOptions(); break;
+            case R.id.rb_teacher: onShowTeacherOptions(); break;
+        }
     }
 
     private void onShowStudentOptions() {
-        showLoading();
+        showTotalLoading();
         presenter.getGrades(new RequestListener<Grade.List>() {
             @Override
             public void onRequestFailure(SpiceException spiceException) {
@@ -169,6 +159,7 @@ public class PickScheduleActivity extends BaseActivity implements PickSchedulePr
 
             @Override
             public void onRequestSuccess(Grade.List grades) {
+                showGradeOption();
                 gradeAdapter.setData(grades);
                 Grade firstGrade = grades.get(0);
                 presenter.getGroups(firstGrade.id, firstGrade.num, new RequestListener<Group.List>() {
@@ -182,8 +173,8 @@ public class PickScheduleActivity extends BaseActivity implements PickSchedulePr
 
                     @Override
                     public void onRequestSuccess(Group.List groups) {
+                        showGroupOption();
                         groupAdapter.setData(groups);
-                        showStudentOptions();
                     }
                 });
             }
@@ -191,7 +182,7 @@ public class PickScheduleActivity extends BaseActivity implements PickSchedulePr
     }
 
     private void onShowTeacherOptions() {
-        showLoading();
+        showTotalLoading();
         presenter.getTeachers(new RequestListener<Teacher.List>() {
             @Override
             public void onRequestFailure(SpiceException spiceException) {
@@ -209,28 +200,36 @@ public class PickScheduleActivity extends BaseActivity implements PickSchedulePr
         });
     }
 
-    private void showLoading() {
-        pbLoading.setVisibility(View.VISIBLE);
+    private void showTotalLoading() {
         spTeacher.setVisibility(View.GONE);
         spGrade.setVisibility(View.GONE);
         spGroup.setVisibility(View.GONE);
         btnOk.setVisibility(View.GONE);
+        pbLoading.setVisibility(View.VISIBLE);
     }
 
-    private void showStudentOptions() {
-        pbLoading.setVisibility(View.GONE);
+    private void showGradeOption() {
+        spTeacher.setVisibility(View.GONE);
+        spGrade.setVisibility(View.VISIBLE);
+        spGroup.setVisibility(View.GONE);
+        btnOk.setVisibility(View.GONE);
+        pbLoading.setVisibility(View.VISIBLE);
+    }
+
+    private void showGroupOption() {
         spTeacher.setVisibility(View.GONE);
         spGrade.setVisibility(View.VISIBLE);
         spGroup.setVisibility(View.VISIBLE);
         btnOk.setVisibility(View.VISIBLE);
+        pbLoading.setVisibility(View.GONE);
     }
 
     private void showTeacherOptions() {
-        pbLoading.setVisibility(View.GONE);
         spTeacher.setVisibility(View.VISIBLE);
         spGrade.setVisibility(View.GONE);
         spGroup.setVisibility(View.GONE);
         btnOk.setVisibility(View.VISIBLE);
+        pbLoading.setVisibility(View.GONE);
     }
 
     @Override

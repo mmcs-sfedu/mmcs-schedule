@@ -28,14 +28,6 @@
 
     </RadioGroup>
 
-    <ProgressBar
-        android:id="@+id/pb_loading"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:indeterminate="true"
-        android:layout_gravity="center"
-        android:layout_margin="32dp"/>
-
     <Spinner
         android:id="@+id/sp_teacher"
         android:layout_width="match_parent"
@@ -65,5 +57,13 @@
         android:layout_gravity="right"
         android:text="@android:string/ok"
         android:visibility="gone" />
+
+    <ProgressBar
+        android:id="@+id/pb_loading"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:indeterminate="true"
+        android:layout_gravity="center"
+        android:layout_margin="32dp"/>
 
 </LinearLayout>
