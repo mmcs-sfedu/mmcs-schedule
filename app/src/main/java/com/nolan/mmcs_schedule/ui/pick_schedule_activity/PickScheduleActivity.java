@@ -102,6 +102,8 @@ public class PickScheduleActivity extends BaseActivity implements PickSchedulePr
                     public void onRequestSuccess(Group.List groups) {
                         showGroupOption();
                         groupAdapter.setData(groups);
+                        spGroup.getOnItemSelectedListener()
+                                .onItemSelected(spGroup, spGroup.getChildAt(0), 0, 0);
                     }
                 });
             }
