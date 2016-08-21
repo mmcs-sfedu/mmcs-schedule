@@ -2,8 +2,10 @@ package com.nolan.mmcs_schedule.utils;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.util.Log;
 
 import com.nolan.mmcs_schedule.ScheduleApplication;
+import com.nolan.mmcs_schedule.ui.schedule_activity.WeekTypeOption;
 
 /**
  * Class that presents access to shared preferences.
@@ -83,6 +85,18 @@ public class UtilsPreferences {
         getPreferences()
                 .edit()
                 .putString(KEY_TITLE, title)
+                .apply();
+    }
+
+    private static final String KEY_WEEK_TYPE_OPTION = "week-type-option";
+    public WeekTypeOption getWeekTypeOption() {
+        return WeekTypeOption.valueOf(
+                getPreferences().getString(KEY_WEEK_TYPE_OPTION, WeekTypeOption.CURRENT.toString()));
+    }
+    public void setWeekTypeOption(WeekTypeOption weekType) {
+        getPreferences()
+                .edit()
+                .putString(KEY_WEEK_TYPE_OPTION, weekType.toString())
                 .apply();
     }
 

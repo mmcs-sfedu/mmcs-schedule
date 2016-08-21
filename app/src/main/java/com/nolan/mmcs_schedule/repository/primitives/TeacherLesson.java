@@ -17,4 +17,15 @@ public class TeacherLesson {
         this.groups = groups;
         this.room = room;
     }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (!(obj instanceof TeacherLesson)) return false;
+        TeacherLesson another = (TeacherLesson) obj;
+        return period.equals(another.period) &&
+                weekType.equals(another.weekType) &&
+                subjectName.equals(another.subjectName) &&
+                groups.equals(another.groups) &&
+                room.equals(another.room);
+    }
 }

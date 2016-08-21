@@ -14,6 +14,7 @@ import android.widget.Toast;
 import com.nolan.mmcs_schedule.Injector;
 import com.nolan.mmcs_schedule.R;
 import com.nolan.mmcs_schedule.repository.ScheduleRepository;
+import com.nolan.mmcs_schedule.repository.primitives.WeekType;
 import com.nolan.mmcs_schedule.ui.BaseActivity;
 import com.nolan.mmcs_schedule.ui.pick_schedule_activity.PickScheduleActivity;
 import com.nolan.mmcs_schedule.utils.UtilsPreferences;
@@ -58,12 +59,18 @@ public class ScheduleActivity extends BaseActivity implements SchedulePresenter.
     }
 
     @Override
+    public void changeWeekType(WeekType weekType) {
+        adapter.setWeekType(weekType);
+        getSupportActionBar().setSubtitle(presenter.getSubtitle());
+    }
+
+    @Override
     protected void onStart() {
         super.onStart();
 
         showLoading();
         presenter.getSchedule(pickedScheduleOfGroup, scheduleId,
-                new RequestListener<DaySchedule.List>() {
+                new RequestListener<ScheduleAdapter.ScheduleData>() {
                     @Override
                     public void onRequestFailure(SpiceException spiceException) {
                         Toast.makeText(
@@ -74,9 +81,10 @@ public class ScheduleActivity extends BaseActivity implements SchedulePresenter.
                     }
 
                     @Override
-                    public void onRequestSuccess(DaySchedule.List schedule) {
+                    public void onRequestSuccess(ScheduleAdapter.ScheduleData schedule) {
                         adapter.setData(schedule);
                         showSchedule();
+                        getSupportActionBar().setSubtitle(presenter.getSubtitle());
                     }
                 });
     }
@@ -84,14 +92,32 @@ public class ScheduleActivity extends BaseActivity implements SchedulePresenter.
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.main_menu, menu);
-        menu.findItem(R.id.mi_another_schedule)
-                .setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
-                    @Override
-                    public boolean onMenuItemClick(MenuItem menuItem) {
-                        presenter.onPickAnotherSchedule();
-                        return true;
-                    }
-                });
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.mi_another_schedule:
+                presenter.onPickAnotherSchedule();
+                break;
+            case R.id.mi_show_current:
+                preferences.setWeekTypeOption(WeekTypeOption.CURRENT);
+                presenter.onWeekTypeOptionChanged(WeekTypeOption.CURRENT);
+                break;
+            case R.id.mi_show_full:
+                preferences.setWeekTypeOption(WeekTypeOption.FULL);
+                presenter.onWeekTypeOptionChanged(WeekTypeOption.FULL);
+                break;
+            case R.id.mi_show_upper:
+                preferences.setWeekTypeOption(WeekTypeOption.UPPER);
+                presenter.onWeekTypeOptionChanged(WeekTypeOption.UPPER);
+                break;
+            case R.id.mi_show_lower:
+                preferences.setWeekTypeOption(WeekTypeOption.LOWER);
+                presenter.onWeekTypeOptionChanged(WeekTypeOption.LOWER);
+                break;
+        }
         return true;
     }
 
@@ -103,7 +129,6 @@ public class ScheduleActivity extends BaseActivity implements SchedulePresenter.
     private void showSchedule() {
         pbLoading.setVisibility(View.GONE);
         lvSchedule.setVisibility(View.VISIBLE);
-
     }
 
     @Override

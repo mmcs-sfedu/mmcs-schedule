@@ -51,5 +51,4 @@ public class TeacherSchedule {
             lessons.get(dayOfWeek).add(new TeacherLesson(period, weekType, subjectName, groups, room));
         }
     }
-
 }

@@ -1,11 +1,35 @@
 <?xml version="1.0" encoding="utf-8"?>
-<menu xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
 
     <item
         android:id="@+id/mi_another_schedule"
-        android:icon="@android:drawable/stat_notify_sync_noanim"
-        android:title="Другое расписание"
-        app:showAsAction="always" />
+        android:icon="@android:drawable/stat_sys_upload_done"
+        android:title="Другое расписание" />
+
+    <item
+        android:id="@+id/mi_week_type"
+        android:title="Выбрать неделю">
+
+        <menu>
+
+            <item
+                android:id="@+id/mi_show_current"
+                android:title="Текущая" />
+
+            <item
+                android:id="@+id/mi_show_full"
+                android:title="Обе" />
+
+            <item
+                android:id="@+id/mi_show_upper"
+                android:title="Верхняя" />
+
+            <item
+                android:id="@+id/mi_show_lower"
+                android:title="Нижняя" />
+
+        </menu>
+
+    </item>
 
 </menu>

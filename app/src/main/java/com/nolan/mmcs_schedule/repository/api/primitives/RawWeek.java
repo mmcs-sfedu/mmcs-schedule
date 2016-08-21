@@ -8,6 +8,7 @@ public class RawWeek
     implements Serializable {
 
     public enum WeekType {
+        @SerializedName("-1")UNKNOWN,
         @SerializedName("0")UPPER,
         @SerializedName("1")LOWER
     }

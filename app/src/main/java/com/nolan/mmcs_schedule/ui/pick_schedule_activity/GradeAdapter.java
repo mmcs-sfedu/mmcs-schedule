@@ -3,7 +3,7 @@ package com.nolan.mmcs_schedule.ui.pick_schedule_activity;
 import com.nolan.mmcs_schedule.repository.primitives.Grade;
 import com.nolan.mmcs_schedule.ui.schedule_activity.CustomArrayAdapter;
 
-class GradeAdapter extends CustomArrayAdapter<Grade> {
+public class GradeAdapter extends CustomArrayAdapter<Grade> {
     @Override
     protected String str(Grade grade) {
         String result;

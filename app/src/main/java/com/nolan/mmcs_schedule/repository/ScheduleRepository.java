@@ -9,9 +9,9 @@ import com.nolan.mmcs_schedule.repository.primitives.Group;
 import com.nolan.mmcs_schedule.repository.primitives.GroupSchedule;
 import com.nolan.mmcs_schedule.repository.primitives.Teacher;
 import com.nolan.mmcs_schedule.repository.primitives.TeacherSchedule;
+import com.nolan.mmcs_schedule.repository.primitives.WeekType;
 import com.octo.android.robospice.SpiceManager;
 import com.octo.android.robospice.persistence.DurationInMillis;
-import com.octo.android.robospice.request.CachedSpiceRequest;
 import com.octo.android.robospice.request.listener.RequestListener;
 import com.octo.android.robospice.request.retrofit.RetrofitSpiceRequest;
 
@@ -114,10 +114,10 @@ public class ScheduleRepository {
         spiceManager.execute(new ScheduleOfGroupRequest(groupId), "getScheduleOfGroup(" + groupId + ")", CACHE_EXPIRY_DURATION, listener);
     }
 
-    private static class ScheduleOfTeacher extends RetrofitSpiceRequest<TeacherSchedule, ScheduleApi> {
+    private static class ScheduleOfTeacherRequest extends RetrofitSpiceRequest<TeacherSchedule, ScheduleApi> {
         private int teacherId;
 
-        public ScheduleOfTeacher(int teacherId) {
+        public ScheduleOfTeacherRequest(int teacherId) {
             super(TeacherSchedule.class, ScheduleApi.class);
             this.teacherId = teacherId;
         }
@@ -129,7 +129,22 @@ public class ScheduleRepository {
     }
 
     public void getScheduleOfTeacher(int teacherId, RequestListener<TeacherSchedule> listener) {
-        spiceManager.execute(new ScheduleOfTeacher(teacherId), "getScheduleOfTeacher(" + teacherId + ")", CACHE_EXPIRY_DURATION, listener);
+        spiceManager.execute(new ScheduleOfTeacherRequest(teacherId), "getScheduleOfTeacher(" + teacherId + ")", CACHE_EXPIRY_DURATION, listener);
+    }
+
+    private static class WeekTypeRequest extends RetrofitSpiceRequest<WeekType, ScheduleApi> {
+        public WeekTypeRequest() {
+            super(WeekType.class, ScheduleApi.class);
+        }
+
+        @Override
+        public WeekType loadDataFromNetwork() throws Exception {
+            return WeekType.convert(getService().getCurrentWeek());
+        }
+    }
+
+    public void getCurrentWeekType(RequestListener<WeekType> listener) {
+        spiceManager.execute(new WeekTypeRequest(), "getCurrentWeekType()", CACHE_EXPIRY_DURATION, listener);
     }
 }
 

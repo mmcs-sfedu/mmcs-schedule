@@ -12,6 +12,13 @@ public class HourMinute {
     }
 
     @Override
+    public boolean equals(Object obj) {
+        if (!(obj instanceof HourMinute)) return false;
+        HourMinute another = (HourMinute) obj;
+        return hour == another.hour && minute == another.minute;
+    }
+
+    @Override
     public String toString() {
         return String.format("%1$02d:%2$02d", hour, minute);
     }

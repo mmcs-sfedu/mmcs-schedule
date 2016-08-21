@@ -7,10 +7,11 @@ import android.widget.BaseAdapter;
 import android.widget.TextView;
 
 import com.nolan.mmcs_schedule.R;
+import com.nolan.mmcs_schedule.repository.primitives.WeekType;
 
 import java.util.ArrayList;
 
-public class ScheduleAdapter extends CustomArrayAdapter<DaySchedule> {
+public class ScheduleAdapter extends BaseAdapter {
     private static class LessonViewHolder {
         public final View self;
         public final TextView tvBeginTime;
@@ -55,7 +56,61 @@ public class ScheduleAdapter extends CustomArrayAdapter<DaySchedule> {
         }
     }
 
-    private void setTextAndSetVisibility(TextView textView, String text) {
+    public static class ScheduleData {
+        private final ArrayList<DaySchedule> scheduleFull;
+        private final ArrayList<DaySchedule> scheduleUpper;
+        private final ArrayList<DaySchedule> scheduleLower;
+
+        public ScheduleData(ArrayList<DaySchedule> scheduleFull,
+                            ArrayList<DaySchedule> scheduleUpper,
+                            ArrayList<DaySchedule> scheduleLower) {
+            this.scheduleFull = scheduleFull;
+            this.scheduleUpper = scheduleUpper;
+            this.scheduleLower = scheduleLower;
+        }
+
+        public ArrayList<DaySchedule> get(WeekType weekType) {
+            switch (weekType) {
+                case FULL: return scheduleFull;
+                case UPPER: return scheduleUpper;
+                case LOWER: return scheduleLower;
+                default:
+                    throw new Error("unreachable statement");
+            }
+        }
+    }
+
+    private ScheduleData scheduleData;
+    private WeekType weekType = WeekType.FULL;
+
+    public void setData(ScheduleData scheduleData) {
+        this.scheduleData = scheduleData;
+        notifyDataSetChanged();
+    }
+
+    public void setWeekType(WeekType weekType) {
+        this.weekType = weekType;
+        notifyDataSetChanged();
+    }
+
+    @Override
+    public int getCount() {
+        if (scheduleData == null) return 0;
+        ArrayList<DaySchedule> schedule = scheduleData.get(weekType);
+        return schedule == null ? 0 : schedule.size();
+    }
+
+    @Override
+    public Object getItem(int i) {
+        return null;
+    }
+
+    @Override
+    public long getItemId(int i) {
+        return 0;
+    }
+
+    private static void setTextAndSetVisibility(TextView textView, String text) {
         textView.setText(text);
         if (text.isEmpty()) {
             textView.setVisibility(View.GONE);
@@ -76,7 +131,7 @@ public class ScheduleAdapter extends CustomArrayAdapter<DaySchedule> {
         if (dayViewHolder == null) {
             dayViewHolder = (DayViewHolder) view.getTag();
         }
-        DaySchedule daySchedule = getItem(i);
+        DaySchedule daySchedule = scheduleData.get(weekType).get(i);
         dayViewHolder.tvDayOfWeek.setText(daySchedule.dayOfWeek);
         int j = 0;
         for (; j < daySchedule.lessons.size(); ++j) {
@@ -88,7 +143,12 @@ public class ScheduleAdapter extends CustomArrayAdapter<DaySchedule> {
             lessonViewHolder.tvPrimaryText.setText(lesson.primaryText);
             setTextAndSetVisibility(lessonViewHolder.tvSecondaryText, lesson.secondaryText);
             setTextAndSetVisibility(lessonViewHolder.tvTertiaryText, lesson.tertiaryText);
-            setTextAndSetVisibility(lessonViewHolder.tvWeekType, lesson.weekType);
+            lessonViewHolder.tvWeekType.setText(lesson.weekType);
+            if (weekType != WeekType.FULL || lesson.weekType.isEmpty()) {
+                lessonViewHolder.tvWeekType.setVisibility(View.GONE);
+            } else {
+                lessonViewHolder.tvWeekType.setVisibility(View.VISIBLE);
+            }
             lessonViewHolder.vBottomDivider.setVisibility(View.VISIBLE);
         }
         dayViewHolder.lessons[j - 1].vBottomDivider.setVisibility(View.GONE);
