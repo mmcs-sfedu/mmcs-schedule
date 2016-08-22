@@ -56,14 +56,14 @@ public class ScheduleAdapter extends BaseAdapter {
         }
     }
 
-    public static class ScheduleData {
+    public static class Data {
         private final ArrayList<DaySchedule> scheduleFull;
         private final ArrayList<DaySchedule> scheduleUpper;
         private final ArrayList<DaySchedule> scheduleLower;
 
-        public ScheduleData(ArrayList<DaySchedule> scheduleFull,
-                            ArrayList<DaySchedule> scheduleUpper,
-                            ArrayList<DaySchedule> scheduleLower) {
+        public Data(ArrayList<DaySchedule> scheduleFull,
+                    ArrayList<DaySchedule> scheduleUpper,
+                    ArrayList<DaySchedule> scheduleLower) {
             this.scheduleFull = scheduleFull;
             this.scheduleUpper = scheduleUpper;
             this.scheduleLower = scheduleLower;
@@ -80,11 +80,11 @@ public class ScheduleAdapter extends BaseAdapter {
         }
     }
 
-    private ScheduleData scheduleData;
+    private Data data;
     private WeekType weekType = WeekType.FULL;
 
-    public void setData(ScheduleData scheduleData) {
-        this.scheduleData = scheduleData;
+    public void setData(Data data) {
+        this.data = data;
         notifyDataSetChanged();
     }
 
@@ -95,8 +95,8 @@ public class ScheduleAdapter extends BaseAdapter {
 
     @Override
     public int getCount() {
-        if (scheduleData == null) return 0;
-        ArrayList<DaySchedule> schedule = scheduleData.get(weekType);
+        if (data == null) return 0;
+        ArrayList<DaySchedule> schedule = data.get(weekType);
         return schedule == null ? 0 : schedule.size();
     }
 
@@ -131,7 +131,7 @@ public class ScheduleAdapter extends BaseAdapter {
         if (dayViewHolder == null) {
             dayViewHolder = (DayViewHolder) view.getTag();
         }
-        DaySchedule daySchedule = scheduleData.get(weekType).get(i);
+        DaySchedule daySchedule = data.get(weekType).get(i);
         dayViewHolder.tvDayOfWeek.setText(daySchedule.dayOfWeek);
         int j = 0;
         for (; j < daySchedule.lessons.size(); ++j) {

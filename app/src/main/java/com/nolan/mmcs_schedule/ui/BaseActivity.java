@@ -22,6 +22,10 @@ public class BaseActivity extends AppCompatActivity {
         spiceManager.shouldStop();
     }
 
+    public SpiceManager getSpiceManager() {
+        return spiceManager;
+    }
+
     public ScheduleRepository getScheduleRepository() {
         return scheduleRepository;
     }

@@ -59,9 +59,13 @@ public class ScheduleActivity extends BaseActivity implements SchedulePresenter.
     }
 
     @Override
+    public void setSubtitle(String subtitle) {
+        getSupportActionBar().setSubtitle(subtitle);
+    }
+
+    @Override
     public void changeWeekType(WeekType weekType) {
         adapter.setWeekType(weekType);
-        getSupportActionBar().setSubtitle(presenter.getSubtitle());
     }
 
     @Override
@@ -70,7 +74,7 @@ public class ScheduleActivity extends BaseActivity implements SchedulePresenter.
 
         showLoading();
         presenter.getSchedule(pickedScheduleOfGroup, scheduleId,
-                new RequestListener<ScheduleAdapter.ScheduleData>() {
+                new RequestListener<ScheduleAdapter.Data>() {
                     @Override
                     public void onRequestFailure(SpiceException spiceException) {
                         Toast.makeText(
@@ -81,10 +85,9 @@ public class ScheduleActivity extends BaseActivity implements SchedulePresenter.
                     }
 
                     @Override
-                    public void onRequestSuccess(ScheduleAdapter.ScheduleData schedule) {
+                    public void onRequestSuccess(ScheduleAdapter.Data schedule) {
                         adapter.setData(schedule);
                         showSchedule();
-                        getSupportActionBar().setSubtitle(presenter.getSubtitle());
                     }
                 });
     }
@@ -102,19 +105,15 @@ public class ScheduleActivity extends BaseActivity implements SchedulePresenter.
                 presenter.onPickAnotherSchedule();
                 break;
             case R.id.mi_show_current:
-                preferences.setWeekTypeOption(WeekTypeOption.CURRENT);
                 presenter.onWeekTypeOptionChanged(WeekTypeOption.CURRENT);
                 break;
             case R.id.mi_show_full:
-                preferences.setWeekTypeOption(WeekTypeOption.FULL);
                 presenter.onWeekTypeOptionChanged(WeekTypeOption.FULL);
                 break;
             case R.id.mi_show_upper:
-                preferences.setWeekTypeOption(WeekTypeOption.UPPER);
                 presenter.onWeekTypeOptionChanged(WeekTypeOption.UPPER);
                 break;
             case R.id.mi_show_lower:
-                preferences.setWeekTypeOption(WeekTypeOption.LOWER);
                 presenter.onWeekTypeOptionChanged(WeekTypeOption.LOWER);
                 break;
         }

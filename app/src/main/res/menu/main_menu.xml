@@ -1,35 +1,43 @@
 <?xml version="1.0" encoding="utf-8"?>
-<menu xmlns:android="http://schemas.android.com/apk/res/android">
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <item
         android:id="@+id/mi_another_schedule"
-        android:icon="@android:drawable/stat_sys_upload_done"
-        android:title="Другое расписание" />
+        android:icon="@drawable/ic_exit_to_app_white_24dp"
+        android:title="Другое расписание"
+        app:showAsAction="ifRoom" />
 
     <item
         android:id="@+id/mi_week_type"
-        android:title="Выбрать неделю">
+        android:icon="@drawable/ic_swap_vert_white_24dp"
+        android:title="Выбрать неделю"
+        app:showAsAction="ifRoom">
 
         <menu>
 
             <item
                 android:id="@+id/mi_show_current"
-                android:title="Текущая" />
-
-            <item
-                android:id="@+id/mi_show_full"
-                android:title="Обе" />
+                android:title="Текущая неделя" />
 
             <item
                 android:id="@+id/mi_show_upper"
-                android:title="Верхняя" />
+                android:title="Только нижняя" />
 
             <item
                 android:id="@+id/mi_show_lower"
-                android:title="Нижняя" />
+                android:title="Только верхняя" />
+
+            <item
+                android:id="@+id/mi_show_full"
+                android:title="Полное расписание" />
 
         </menu>
 
     </item>
+
+    <item
+        android:id="@+id/mi_about"
+        android:title="О программе" />
 
 </menu>

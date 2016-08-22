@@ -17,6 +17,7 @@ import java.util.ArrayList;
 public class SchedulePresenter {
     public interface View {
         void startPickScheduleActivity();
+        void setSubtitle(String subtitle);
         void changeWeekType(WeekType weekType);
     }
 
@@ -32,34 +33,26 @@ public class SchedulePresenter {
         this.preferences = preferences;
     }
 
-    public String getSubtitle() {
-        if (weekType == null) return "";
-        switch (weekType) {
-            case UPPER:
-                return "Верхняя неделя";
-            case LOWER:
-                return "Нижняя неделя";
-            case FULL:
-                return "Полное расписание";
-            default:
-                throw new Error("unreachable statement");
-        }
-    }
-
     public void onPickAnotherSchedule() {
         preferences.setScheduleWasPicked(false);
         view.startPickScheduleActivity();
     }
 
-    public void onWeekTypeOptionChanged(WeekTypeOption weekTypeOption) {
+    public WeekType getWeekType(WeekTypeOption weekTypeOption) {
         switch (weekTypeOption) {
-            case CURRENT: weekType = currentWeek; break;
-            case FULL: weekType = WeekType.FULL; break;
-            case UPPER: weekType = WeekType.UPPER; break;
-            case LOWER: weekType = WeekType.LOWER; break;
+            case CURRENT: return currentWeek;
+            case FULL: return WeekType.FULL;
+            case UPPER: return WeekType.UPPER;
+            case LOWER: return WeekType.LOWER;
             default:
                 throw new Error("unreachable statement");
         }
+    }
+
+    public void onWeekTypeOptionChanged(WeekTypeOption weekTypeOption) {
+        preferences.setWeekTypeOption(weekTypeOption);
+        weekType = getWeekType(weekTypeOption);
+        view.setSubtitle(getSubtitle(weekType));
         view.changeWeekType(weekType);
     }
 
@@ -77,8 +70,19 @@ public class SchedulePresenter {
             "Пятница", "Суббота", "Воскресенье"
     };
 
+    private String getSubtitle(WeekType weekType) {
+        if (weekType == null) return "";
+        switch (weekType) {
+            case UPPER: return "Верхняя неделя";
+            case LOWER: return "Нижняя неделя";
+            case FULL: return "Полное расписание";
+            default:
+                throw new Error("unreachable statement");
+        }
+    }
+
     public void getSchedule(final boolean pickedScheduleOfGroup, final int id,
-                            final RequestListener<ScheduleAdapter.ScheduleData> listener) {
+                            final RequestListener<ScheduleAdapter.Data> listener) {
         repository.getCurrentWeekType(new RequestListener<WeekType>() {
             @Override
             public void onRequestFailure(SpiceException spiceException) {
@@ -88,14 +92,16 @@ public class SchedulePresenter {
             @Override
             public void onRequestSuccess(WeekType weekType) {
                 currentWeek = weekType;
-                onWeekTypeOptionChanged(preferences.getWeekTypeOption());
+                WeekTypeOption weekTypeOption = preferences.getWeekTypeOption();
+                SchedulePresenter.this.weekType = getWeekType(weekTypeOption);
+                view.setSubtitle(getSubtitle(SchedulePresenter.this.weekType));
                 getWeekTypeDone(pickedScheduleOfGroup, id, listener);
             }
         });
     }
 
-    public void getWeekTypeDone(boolean pickedScheduleOfGroup, int id,
-                            final RequestListener<ScheduleAdapter.ScheduleData> listener) {
+    private void getWeekTypeDone(boolean pickedScheduleOfGroup, int id,
+                            final RequestListener<ScheduleAdapter.Data> listener) {
         if (pickedScheduleOfGroup) {
             repository.getScheduleOfGroup(id, new RequestListener<GroupSchedule>() {
                 @Override
@@ -105,38 +111,7 @@ public class SchedulePresenter {
 
                 @Override
                 public void onRequestSuccess(GroupSchedule groupSchedule) {
-                    DaySchedule.List scheduleFull = new DaySchedule.List();
-                    DaySchedule.List scheduleUpper = new DaySchedule.List();
-                    DaySchedule.List scheduleLower = new DaySchedule.List();
-                    for (int i = 0; i < 6; ++i) {
-                        ArrayList<Lesson> lessonsFull = new ArrayList<>();
-                        ArrayList<Lesson> lessonsUpper = new ArrayList<>();
-                        ArrayList<Lesson> lessonsLower = new ArrayList<>();
-                        for (GroupLesson lesson : groupSchedule.lessons.get(i)) {
-                            Lesson textual = new Lesson(
-                                    lesson.period.begin.toString(),
-                                    lesson.period.end.toString(),
-                                    lesson.subjectName,
-                                    TextUtils.join(", ", lesson.rooms),
-                                    TextUtils.join("\n", lesson.teachers),
-                                    str(lesson.weekType));
-                            lessonsFull.add(textual);
-                            if (lesson.weekType != WeekType.LOWER) {
-                                lessonsUpper.add(textual);
-                            }
-                            if (lesson.weekType != WeekType.UPPER) {
-                                lessonsLower.add(textual);
-                            }
-                        }
-                        if (lessonsFull.isEmpty())
-                            continue;
-                        scheduleFull.add(new DaySchedule(DAYS_OF_WEEK[i], lessonsFull));
-                        scheduleUpper.add(new DaySchedule(DAYS_OF_WEEK[i], lessonsUpper));
-                        scheduleLower.add(new DaySchedule(DAYS_OF_WEEK[i], lessonsLower));
-                    }
-                    listener.onRequestSuccess(new ScheduleAdapter.ScheduleData(
-                            scheduleFull, scheduleUpper, scheduleLower
-                    ));
+                    listener.onRequestSuccess(groupScheduleToAdapterData(groupSchedule));
                 }
             });
         } else {
@@ -148,40 +123,83 @@ public class SchedulePresenter {
 
                 @Override
                 public void onRequestSuccess(TeacherSchedule teacherSchedule) {
-                    DaySchedule.List scheduleFull = new DaySchedule.List();
-                    DaySchedule.List scheduleUpper = new DaySchedule.List();
-                    DaySchedule.List scheduleLower = new DaySchedule.List();
-                    for (int i = 0; i < 6; ++i) {
-                        ArrayList<Lesson> lessonsFull = new ArrayList<>();
-                        ArrayList<Lesson> lessonsUpper = new ArrayList<>();
-                        ArrayList<Lesson> lessonsLower = new ArrayList<>();
-                        for (TeacherLesson lesson : teacherSchedule.lessons.get(i)) {
-                            Lesson textual = new Lesson(
-                                    lesson.period.begin.toString(),
-                                    lesson.period.end.toString(),
-                                    lesson.subjectName,
-                                    lesson.room,
-                                    TextUtils.join(", ", lesson.groups),
-                                    str(lesson.weekType));
-                            lessonsFull.add(textual);
-                            if (lesson.weekType != WeekType.LOWER) {
-                                lessonsUpper.add(textual);
-                            }
-                            if (lesson.weekType != WeekType.UPPER) {
-                                lessonsLower.add(textual);
-                            }
-                        }
-                        if (lessonsFull.isEmpty())
-                            continue;
-                        scheduleFull.add(new DaySchedule(DAYS_OF_WEEK[i], lessonsFull));
-                        scheduleUpper.add(new DaySchedule(DAYS_OF_WEEK[i], lessonsUpper));
-                        scheduleLower.add(new DaySchedule(DAYS_OF_WEEK[i], lessonsLower));
-                    }
-                    listener.onRequestSuccess(new ScheduleAdapter.ScheduleData(
-                            scheduleFull, scheduleUpper, scheduleLower
-                    ));
+                    listener.onRequestSuccess(teacherScheduleToAdapterData(teacherSchedule));
                 }
             });
         }
+    }
+
+    private static ScheduleAdapter.Data groupScheduleToAdapterData(GroupSchedule groupSchedule) {
+        DaySchedule.List scheduleFull = new DaySchedule.List();
+        DaySchedule.List scheduleUpper = new DaySchedule.List();
+        DaySchedule.List scheduleLower = new DaySchedule.List();
+        for (int i = 0; i < 6; ++i) {
+            ArrayList<Lesson> lessonsFull = new ArrayList<>();
+            ArrayList<Lesson> lessonsUpper = new ArrayList<>();
+            ArrayList<Lesson> lessonsLower = new ArrayList<>();
+            for (GroupLesson lesson : groupSchedule.lessons.get(i)) {
+                Lesson textual = new Lesson(
+                        lesson.period.begin.toString(),
+                        lesson.period.end.toString(),
+                        lesson.subjectName,
+                        TextUtils.join(", ", lesson.rooms),
+                        TextUtils.join("\n", lesson.teachers),
+                        str(lesson.weekType));
+                lessonsFull.add(textual);
+                if (lesson.weekType != WeekType.LOWER) {
+                    lessonsUpper.add(textual);
+                }
+                if (lesson.weekType != WeekType.UPPER) {
+                    lessonsLower.add(textual);
+                }
+            }
+            if (!lessonsFull.isEmpty()) {
+                scheduleFull.add(new DaySchedule(DAYS_OF_WEEK[i], lessonsFull));
+            }
+            if (!lessonsUpper.isEmpty()) {
+                scheduleUpper.add(new DaySchedule(DAYS_OF_WEEK[i], lessonsUpper));
+            }
+            if (!lessonsLower.isEmpty()) {
+                scheduleLower.add(new DaySchedule(DAYS_OF_WEEK[i], lessonsLower));
+            }
+        }
+        return new ScheduleAdapter.Data(scheduleFull, scheduleUpper, scheduleLower);
+    }
+
+    private static ScheduleAdapter.Data teacherScheduleToAdapterData(TeacherSchedule teacherSchedule) {
+        DaySchedule.List scheduleFull = new DaySchedule.List();
+        DaySchedule.List scheduleUpper = new DaySchedule.List();
+        DaySchedule.List scheduleLower = new DaySchedule.List();
+        for (int i = 0; i < 6; ++i) {
+            ArrayList<Lesson> lessonsFull = new ArrayList<>();
+            ArrayList<Lesson> lessonsUpper = new ArrayList<>();
+            ArrayList<Lesson> lessonsLower = new ArrayList<>();
+            for (TeacherLesson lesson : teacherSchedule.lessons.get(i)) {
+                Lesson textual = new Lesson(
+                        lesson.period.begin.toString(),
+                        lesson.period.end.toString(),
+                        lesson.subjectName,
+                        lesson.room,
+                        TextUtils.join(", ", lesson.groups),
+                        str(lesson.weekType));
+                lessonsFull.add(textual);
+                if (lesson.weekType != WeekType.LOWER) {
+                    lessonsUpper.add(textual);
+                }
+                if (lesson.weekType != WeekType.UPPER) {
+                    lessonsLower.add(textual);
+                }
+            }
+            if (!lessonsFull.isEmpty()) {
+                scheduleFull.add(new DaySchedule(DAYS_OF_WEEK[i], lessonsFull));
+            }
+            if (!lessonsUpper.isEmpty()) {
+                scheduleUpper.add(new DaySchedule(DAYS_OF_WEEK[i], lessonsUpper));
+            }
+            if (!lessonsLower.isEmpty()) {
+                scheduleLower.add(new DaySchedule(DAYS_OF_WEEK[i], lessonsLower));
+            }
+        }
+        return new ScheduleAdapter.Data(scheduleFull, scheduleUpper, scheduleLower);
     }
 }

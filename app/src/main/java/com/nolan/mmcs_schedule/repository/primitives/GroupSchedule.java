@@ -12,6 +12,10 @@ import java.util.TreeSet;
 public class GroupSchedule {
     public final ArrayList<TreeSet<GroupLesson>> lessons;
 
+    public GroupSchedule(ArrayList<TreeSet<GroupLesson>> lessons) {
+        this.lessons = lessons;
+    }
+
     public GroupSchedule(RawScheduleOfGroup rawScheduleOfGroup) {
         TreeMap<Integer, ArrayList<RawCurriculum>> lessonIdToCurricula = new TreeMap<>();
         for (RawCurriculum rawCurriculum : rawScheduleOfGroup.getCurricula()) {

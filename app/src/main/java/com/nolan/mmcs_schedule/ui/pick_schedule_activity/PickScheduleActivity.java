@@ -3,7 +3,10 @@ package com.nolan.mmcs_schedule.ui.pick_schedule_activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.support.annotation.Nullable;
+import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Button;
@@ -87,6 +90,7 @@ public class PickScheduleActivity extends BaseActivity implements PickSchedulePr
         spGrade.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+                Log.i("tag", "grade selected");
                 showGradeOption();
                 Grade grade = gradeAdapter.getItem(i);
                 presenter.getGroups(grade.id, grade.num, new RequestListener<Group.List>() {
@@ -102,6 +106,7 @@ public class PickScheduleActivity extends BaseActivity implements PickSchedulePr
                     public void onRequestSuccess(Group.List groups) {
                         showGroupOption();
                         groupAdapter.setData(groups);
+                        spGroup.setSelection(0);
                         spGroup.getOnItemSelectedListener()
                                 .onItemSelected(spGroup, spGroup.getChildAt(0), 0, 0);
                     }
@@ -140,7 +145,6 @@ public class PickScheduleActivity extends BaseActivity implements PickSchedulePr
                 presenter.onOk();
             }
         });
-        btnOk.setEnabled(false);
 
         switch (rgScheduleType.getCheckedRadioButtonId()) {
             case R.id.rb_student: onShowStudentOptions(); break;
@@ -160,25 +164,12 @@ public class PickScheduleActivity extends BaseActivity implements PickSchedulePr
             }
 
             @Override
-            public void onRequestSuccess(Grade.List grades) {
+            public void onRequestSuccess(final Grade.List grades) {
                 showGradeOption();
                 gradeAdapter.setData(grades);
-                Grade firstGrade = grades.get(0);
-                presenter.getGroups(firstGrade.id, firstGrade.num, new RequestListener<Group.List>() {
-                    @Override
-                    public void onRequestFailure(SpiceException spiceException) {
-                        Toast.makeText(
-                                PickScheduleActivity.this,
-                                "Ошибка при загрузке списка групп",
-                                Toast.LENGTH_LONG).show();
-                    }
-
-                    @Override
-                    public void onRequestSuccess(Group.List groups) {
-                        showGroupOption();
-                        groupAdapter.setData(groups);
-                    }
-                });
+                spGrade.setSelection(0);
+                spGrade.getOnItemSelectedListener()
+                        .onItemSelected(spGrade, spGrade.getChildAt(0), 0, 0);
             }
         });
     }
@@ -208,6 +199,7 @@ public class PickScheduleActivity extends BaseActivity implements PickSchedulePr
         spGroup.setVisibility(View.GONE);
         btnOk.setVisibility(View.GONE);
         pbLoading.setVisibility(View.VISIBLE);
+        btnOk.setEnabled(false);
     }
 
     private void showGradeOption() {
@@ -216,6 +208,7 @@ public class PickScheduleActivity extends BaseActivity implements PickSchedulePr
         spGroup.setVisibility(View.GONE);
         btnOk.setVisibility(View.GONE);
         pbLoading.setVisibility(View.VISIBLE);
+        btnOk.setEnabled(false);
     }
 
     private void showGroupOption() {
