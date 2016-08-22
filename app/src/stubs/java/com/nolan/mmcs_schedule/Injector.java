@@ -78,17 +78,23 @@ public class Injector {
             Comparator<GroupLesson> comparator = new Comparator<GroupLesson>() {
                 @Override
                 public int compare(GroupLesson lhs, GroupLesson rhs) {
-                    return lhs.period.begin.hour > rhs.period.begin.hour ? 1 : -1;
+                    return lhs.period.begin.hour < rhs.period.begin.hour ? -1 : 1;
                 }
             };
-            for (int i = 0; i < 6; ++i) {
+            for (int i = 0; i < 7; ++i) {
                 TreeSet<GroupLesson> lessonsOfDay = new TreeSet<>(comparator);
                 lessons.add(lessonsOfDay);
                 addGroupLesson(lessons.get(i), 0, WeekType.UPPER, "One");
                 addGroupLesson(lessons.get(i), 1, WeekType.UPPER, "Two");
                 addGroupLesson(lessons.get(i), 1, WeekType.LOWER, "Three");
-                addGroupLesson(lessons.get(i), 2, WeekType.FULL, "Four");
-                addGroupLesson(lessons.get(i), 4, WeekType.FULL, "Five");
+                if (i % 2 == 0) {
+                    addGroupLesson(lessons.get(i), 2, WeekType.FULL, "Four");
+                }
+                addGroupLesson(lessons.get(i), 3, WeekType.UPPER, "Five");
+                addGroupLesson(lessons.get(i), 3, WeekType.LOWER, "Six");
+                if (i % 3 == 0) {
+                    addGroupLesson(lessons.get(i), 4, WeekType.FULL, "Seven");
+                }
             }
             listener.onRequestSuccess(new GroupSchedule(lessons));
         }

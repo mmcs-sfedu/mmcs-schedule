@@ -27,14 +27,14 @@ public class GroupSchedule {
             }
             curricula.add(rawCurriculum);
         }
-        lessons = new ArrayList<>(6);
+        lessons = new ArrayList<>(7);
         Comparator<GroupLesson> comparator = new Comparator<GroupLesson>() {
             @Override
             public int compare(GroupLesson lhs, GroupLesson rhs) {
                 return lhs.period.begin.hour > rhs.period.begin.hour ? 1 : -1;
             }
         };
-        for (int i = 0; i < 6; ++i) {
+        for (int i = 0; i < 7; ++i) {
             lessons.add(new TreeSet<>(comparator));
         }
         for (RawLesson rawLesson : rawScheduleOfGroup.getLessons()) {

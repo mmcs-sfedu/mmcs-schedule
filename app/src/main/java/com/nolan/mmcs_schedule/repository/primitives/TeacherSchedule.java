@@ -28,14 +28,14 @@ public class TeacherSchedule {
             }
             groupsWithSameUberId.add(group.toString());
         }
-        lessons = new ArrayList<>(6);
+        lessons = new ArrayList<>(7);
         Comparator<TeacherLesson> comparator = new Comparator<TeacherLesson>() {
             @Override
             public int compare(TeacherLesson lhs, TeacherLesson rhs) {
                 return lhs.period.begin.hour > rhs.period.begin.hour ? 1 : -1;
             }
         };
-        for (int i = 0; i < 6; ++i) {
+        for (int i = 0; i < 7; ++i) {
             lessons.add(new TreeSet<>(comparator));
         }
         for (RawLesson lesson : scheduleOfTeacher.getLessons()) {

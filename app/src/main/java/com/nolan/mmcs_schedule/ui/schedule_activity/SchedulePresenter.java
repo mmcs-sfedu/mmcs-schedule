@@ -133,7 +133,7 @@ public class SchedulePresenter {
         DaySchedule.List scheduleFull = new DaySchedule.List();
         DaySchedule.List scheduleUpper = new DaySchedule.List();
         DaySchedule.List scheduleLower = new DaySchedule.List();
-        for (int i = 0; i < 6; ++i) {
+        for (int i = 0; i < groupSchedule.lessons.size(); ++i) {
             ArrayList<Lesson> lessonsFull = new ArrayList<>();
             ArrayList<Lesson> lessonsUpper = new ArrayList<>();
             ArrayList<Lesson> lessonsLower = new ArrayList<>();

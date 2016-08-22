@@ -82,7 +82,6 @@ public class ScheduleRepository {
         @Override
         public Teacher.List loadDataFromNetwork() throws Exception {
             RawTeacher.List rawTeachers = getService().getTeachers();
-            rawTeachers.remove(0);
             Teacher.List teachers = new Teacher.List();
             teachers.ensureCapacity(rawTeachers.size());
             for (RawTeacher rawTeacher : rawTeachers) {
