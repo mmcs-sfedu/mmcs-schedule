@@ -95,6 +95,7 @@ public class SchedulePresenter {
                 WeekTypeOption weekTypeOption = preferences.getWeekTypeOption();
                 SchedulePresenter.this.weekType = getWeekType(weekTypeOption);
                 view.setSubtitle(getSubtitle(SchedulePresenter.this.weekType));
+                view.changeWeekType(weekType);
                 getWeekTypeDone(pickedScheduleOfGroup, id, listener);
             }
         });

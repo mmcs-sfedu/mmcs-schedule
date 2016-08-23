@@ -40,7 +40,7 @@ public class ScheduleActivity extends BaseActivity implements SchedulePresenter.
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_schedule);
 
         pbLoading = (ProgressBar) findViewById(R.id.pb_loading);
         lvSchedule = (ListView) findViewById(R.id.lv_schedule);

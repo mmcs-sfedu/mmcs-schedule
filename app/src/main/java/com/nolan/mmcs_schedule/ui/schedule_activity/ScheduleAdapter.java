@@ -191,6 +191,9 @@ public class ScheduleAdapter extends BaseAdapter {
             }
             lessonViewHolder.vBottomDivider.setVisibility(View.VISIBLE);
         }
+        LessonViewHolder lessonViewHolder = (LessonViewHolder)
+                dayViewHolder.ll.getChildAt(daySchedule.lessons.size() + 1).getTag();
+        lessonViewHolder.vBottomDivider.setVisibility(View.GONE);
         return view;
     }
 }
