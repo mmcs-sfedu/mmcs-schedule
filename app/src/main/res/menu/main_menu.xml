@@ -36,8 +36,4 @@
 
     </item>
 
-    <item
-        android:id="@+id/mi_about"
-        android:title="О программе" />
-
 </menu>
