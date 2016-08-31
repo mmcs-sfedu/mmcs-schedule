@@ -12,7 +12,7 @@ public class Group {
 
     public Group(RawGroup group, int gradeNum) {
         this.id = group.getId();
-        this.name = group.getName().equals("NULL") ? null : group.getName();
+        this.name = group.getName() == null || group.getName().equals("NULL") ? null : group.getName();
         this.num = group.getNum();
         this.gradeNum = gradeNum;
     }
