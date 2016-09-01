@@ -4,9 +4,9 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class LessonTime {
-    public final LessonPeriod period;
-    public final int dayOfWeek;
-    public final WeekType weekType;
+    private LessonPeriod period;
+    private int dayOfWeek;
+    private WeekType weekType;
 
     public LessonTime(String timeSlot) {
         Pattern pattern = Pattern.compile(
@@ -25,5 +25,17 @@ public class LessonTime {
             default:
                 throw new Error("unreachable statement");
         }
+    }
+
+    public LessonPeriod getPeriod() {
+        return period;
+    }
+
+    public int getDayOfWeek() {
+        return dayOfWeek;
+    }
+
+    public WeekType getWeekType() {
+        return weekType;
     }
 }

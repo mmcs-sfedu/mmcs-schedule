@@ -1,7 +1,9 @@
 package com.nolan.mmcs_schedule.ui.schedule_activity;
 
 import android.text.TextUtils;
+import android.util.Log;
 
+import com.google.gson.Gson;
 import com.nolan.mmcs_schedule.repository.ScheduleRepository;
 import com.nolan.mmcs_schedule.repository.primitives.GroupLesson;
 import com.nolan.mmcs_schedule.repository.primitives.GroupSchedule;
@@ -112,7 +114,11 @@ public class SchedulePresenter {
 
                 @Override
                 public void onRequestSuccess(GroupSchedule groupSchedule) {
-                    listener.onRequestSuccess(groupScheduleToAdapterData(groupSchedule));
+                    Gson gson = new Gson();
+                    String json = gson.toJson(groupSchedule);
+                    Log.i("json", json);
+                    GroupSchedule groupSchedule1 = gson.fromJson(json, GroupSchedule.class);
+                    listener.onRequestSuccess(groupScheduleToAdapterData(groupSchedule1));
                 }
             });
         } else {
@@ -134,23 +140,23 @@ public class SchedulePresenter {
         DaySchedule.List scheduleFull = new DaySchedule.List();
         DaySchedule.List scheduleUpper = new DaySchedule.List();
         DaySchedule.List scheduleLower = new DaySchedule.List();
-        for (int i = 0; i < groupSchedule.lessons.size(); ++i) {
+        for (int i = 0; i < groupSchedule.getLessons().size(); ++i) {
             ArrayList<Lesson> lessonsFull = new ArrayList<>();
             ArrayList<Lesson> lessonsUpper = new ArrayList<>();
             ArrayList<Lesson> lessonsLower = new ArrayList<>();
-            for (GroupLesson lesson : groupSchedule.lessons.get(i)) {
+            for (GroupLesson lesson : groupSchedule.getLessons().get(i)) {
                 Lesson textual = new Lesson(
-                        lesson.period.begin.toString(),
-                        lesson.period.end.toString(),
-                        lesson.subjectName,
-                        TextUtils.join(", ", lesson.rooms),
-                        TextUtils.join("\n", lesson.teachers),
-                        str(lesson.weekType));
+                        lesson.getPeriod().getBegin().toString(),
+                        lesson.getPeriod().getEnd().toString(),
+                        lesson.getSubjectName(),
+                        TextUtils.join(", ", lesson.getRooms()),
+                        TextUtils.join("\n", lesson.getTeachers()),
+                        str(lesson.getWeekType()));
                 lessonsFull.add(textual);
-                if (lesson.weekType != WeekType.LOWER) {
+                if (lesson.getWeekType() != WeekType.LOWER) {
                     lessonsUpper.add(textual);
                 }
-                if (lesson.weekType != WeekType.UPPER) {
+                if (lesson.getWeekType() != WeekType.UPPER) {
                     lessonsLower.add(textual);
                 }
             }
@@ -175,19 +181,19 @@ public class SchedulePresenter {
             ArrayList<Lesson> lessonsFull = new ArrayList<>();
             ArrayList<Lesson> lessonsUpper = new ArrayList<>();
             ArrayList<Lesson> lessonsLower = new ArrayList<>();
-            for (TeacherLesson lesson : teacherSchedule.lessons.get(i)) {
+            for (TeacherLesson lesson : teacherSchedule.getLessons().get(i)) {
                 Lesson textual = new Lesson(
-                        lesson.period.begin.toString(),
-                        lesson.period.end.toString(),
-                        lesson.subjectName,
-                        lesson.room,
-                        TextUtils.join(", ", lesson.groups),
-                        str(lesson.weekType));
+                        lesson.getPeriod().getBegin().toString(),
+                        lesson.getPeriod().getEnd().toString(),
+                        lesson.getSubjectName(),
+                        lesson.getRoom(),
+                        TextUtils.join(", ", lesson.getGroups()),
+                        str(lesson.getWeekType()));
                 lessonsFull.add(textual);
-                if (lesson.weekType != WeekType.LOWER) {
+                if (lesson.getWeekType() != WeekType.LOWER) {
                     lessonsUpper.add(textual);
                 }
-                if (lesson.weekType != WeekType.UPPER) {
+                if (lesson.getWeekType() != WeekType.UPPER) {
                     lessonsLower.add(textual);
                 }
             }

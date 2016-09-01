@@ -29,17 +29,17 @@ public class PickSchedulePresenter {
 
     public void onPickTeacher(Teacher teacher) {
         pickedScheduleOfGroup = false;
-        scheduleId = teacher.id;
-        title = teacher.name;
+        scheduleId = teacher.getId();
+        title = teacher.getName();
     }
 
     public void onPickGroup(Group group) {
         pickedScheduleOfGroup = true;
-        scheduleId = group.id;
-        if (group.name == null) {
-            title = "Группа " + group.gradeNum + "." + group.num;
+        scheduleId = group.getId();
+        if (group.getName() == null) {
+            title = "Группа " + group.getGradeNum() + "." + group.getNum();
         } else {
-            title = "Группа " + group.name + " " + group.gradeNum + "." + group.num;
+            title = "Группа " + group.getName() + " " + group.getGradeNum() + "." + group.getNum();
         }
     }
 

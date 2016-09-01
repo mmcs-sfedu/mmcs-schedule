@@ -10,11 +10,7 @@ import java.util.TreeMap;
 import java.util.TreeSet;
 
 public class GroupSchedule {
-    public final ArrayList<TreeSet<GroupLesson>> lessons;
-
-    public GroupSchedule(ArrayList<TreeSet<GroupLesson>> lessons) {
-        this.lessons = lessons;
-    }
+    private ArrayList<TreeSet<GroupLesson>> lessons;
 
     public GroupSchedule(RawScheduleOfGroup rawScheduleOfGroup) {
         TreeMap<Integer, ArrayList<RawCurriculum>> lessonIdToCurricula = new TreeMap<>();
@@ -28,21 +24,15 @@ public class GroupSchedule {
             curricula.add(rawCurriculum);
         }
         lessons = new ArrayList<>(7);
-        Comparator<GroupLesson> comparator = new Comparator<GroupLesson>() {
-            @Override
-            public int compare(GroupLesson lhs, GroupLesson rhs) {
-                return lhs.period.begin.hour > rhs.period.begin.hour ? 1 : -1;
-            }
-        };
         for (int i = 0; i < 7; ++i) {
-            lessons.add(new TreeSet<>(comparator));
+            lessons.add(new TreeSet<GroupLesson>());
         }
         for (RawLesson rawLesson : rawScheduleOfGroup.getLessons()) {
             ArrayList<RawCurriculum> curricula = lessonIdToCurricula.get(rawLesson.getId());
             if (curricula == null) continue;
             LessonTime lessonTime = new LessonTime(rawLesson.getTimeSlot());
-            LessonPeriod period = lessonTime.period;
-            WeekType weekType = lessonTime.weekType;
+            LessonPeriod period = lessonTime.getPeriod();
+            WeekType weekType = lessonTime.getWeekType();
             String subjectName = curricula.get(0).getSubjectName();
             TreeSet<String> teachers = new TreeSet<>();
             ArrayList<String> rooms = new ArrayList<>();
@@ -53,10 +43,13 @@ public class GroupSchedule {
                     rooms.add("а." + roomName);
                 }
             }
-            int dayOfWeek = lessonTime.dayOfWeek;
+            int dayOfWeek = lessonTime.getDayOfWeek();
             lessons.get(dayOfWeek).add(new GroupLesson(
                     period, weekType, subjectName, teachers, rooms));
         }
     }
 
+    public ArrayList<TreeSet<GroupLesson>> getLessons() {
+        return lessons;
+    }
 }

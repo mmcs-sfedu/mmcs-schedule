@@ -75,12 +75,6 @@ public class Injector {
         @Override
         public void getScheduleOfGroup(int groupId, RequestListener<GroupSchedule> listener) {
             ArrayList<TreeSet<GroupLesson>> lessons = new ArrayList<>();
-            Comparator<GroupLesson> comparator = new Comparator<GroupLesson>() {
-                @Override
-                public int compare(GroupLesson lhs, GroupLesson rhs) {
-                    return lhs.period.begin.hour < rhs.period.begin.hour ? -1 : 1;
-                }
-            };
             for (int i = 0; i < 7; ++i) {
                 TreeSet<GroupLesson> lessonsOfDay = new TreeSet<>(comparator);
                 lessons.add(lessonsOfDay);

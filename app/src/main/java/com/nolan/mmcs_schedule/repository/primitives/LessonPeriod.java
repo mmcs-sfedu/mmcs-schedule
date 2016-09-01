@@ -1,8 +1,8 @@
 package com.nolan.mmcs_schedule.repository.primitives;
 
 public class LessonPeriod {
-    public final HourMinute begin;
-    public final HourMinute end;
+    private HourMinute begin;
+    private HourMinute end;
 
     public LessonPeriod(HourMinute begin, HourMinute end) {
         this.begin = begin;
@@ -15,5 +15,13 @@ public class LessonPeriod {
         LessonPeriod another = (LessonPeriod) obj;
         return begin.equals(another.begin) &&
                 end.equals(another.end);
+    }
+
+    public HourMinute getBegin() {
+        return begin;
+    }
+
+    public HourMinute getEnd() {
+        return end;
     }
 }

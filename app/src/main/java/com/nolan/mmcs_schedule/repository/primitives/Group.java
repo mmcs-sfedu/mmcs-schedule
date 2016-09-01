@@ -5,10 +5,10 @@ import com.nolan.mmcs_schedule.repository.api.primitives.RawGroup;
 import java.util.ArrayList;
 
 public class Group {
-    public final int id;
-    public final String name;
-    public final int num;
-    public final int gradeNum;
+    private int id;
+    private String name;
+    private int num;
+    private int gradeNum;
 
     public Group(RawGroup group, int gradeNum) {
         this.id = group.getId();
@@ -18,4 +18,20 @@ public class Group {
     }
 
     public static class List extends ArrayList<Group> { }
+
+    public int getId() {
+        return id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public int getNum() {
+        return num;
+    }
+
+    public int getGradeNum() {
+        return gradeNum;
+    }
 }

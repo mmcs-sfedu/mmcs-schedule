@@ -6,12 +6,11 @@ import com.nolan.mmcs_schedule.repository.api.primitives.RawLesson;
 import com.nolan.mmcs_schedule.repository.api.primitives.RawScheduleOfTeacher;
 
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
 public class TeacherSchedule {
-    public final ArrayList<TreeSet<TeacherLesson>> lessons;
+    private ArrayList<TreeSet<TeacherLesson>> lessons;
 
     public TeacherSchedule(RawScheduleOfTeacher scheduleOfTeacher) {
         TreeMap<Integer, RawCurriculum> lessonIdToCurriculum = new TreeMap<>();
@@ -29,26 +28,24 @@ public class TeacherSchedule {
             groupsWithSameUberId.add(group.toString());
         }
         lessons = new ArrayList<>(7);
-        Comparator<TeacherLesson> comparator = new Comparator<TeacherLesson>() {
-            @Override
-            public int compare(TeacherLesson lhs, TeacherLesson rhs) {
-                return lhs.period.begin.hour > rhs.period.begin.hour ? 1 : -1;
-            }
-        };
         for (int i = 0; i < 7; ++i) {
-            lessons.add(new TreeSet<>(comparator));
+            lessons.add(new TreeSet<TeacherLesson>());
         }
         for (RawLesson lesson : scheduleOfTeacher.getLessons()) {
             LessonTime lessonTime = new LessonTime(lesson.getTimeSlot());
             RawCurriculum curriculum = lessonIdToCurriculum.get(lesson.getId());
             int uberId = lesson.getUberId();
-            LessonPeriod period = lessonTime.period;
-            WeekType weekType = lessonTime.weekType;
+            LessonPeriod period = lessonTime.getPeriod();
+            WeekType weekType = lessonTime.getWeekType();
             String subjectName = curriculum.getSubjectName();
             ArrayList<String> groups = uberIdToGroups.get(uberId);
             String room = curriculum.getRoomName().isEmpty() ? "" : "а." + curriculum.getRoomName();
-            int dayOfWeek = lessonTime.dayOfWeek;
+            int dayOfWeek = lessonTime.getDayOfWeek();
             lessons.get(dayOfWeek).add(new TeacherLesson(period, weekType, subjectName, groups, room));
         }
+    }
+
+    public ArrayList<TreeSet<TeacherLesson>> getLessons() {
+        return lessons;
     }
 }

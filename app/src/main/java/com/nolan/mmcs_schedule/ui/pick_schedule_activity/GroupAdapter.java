@@ -7,10 +7,10 @@ public class GroupAdapter extends CustomArrayAdapter<Group> {
     @Override
     protected String str(Group group) {
         String result = "";
-        if (group.name != null) {
-            result += group.name + ", ";
+        if (group.getName() != null) {
+            result += group.getName() + ", ";
         }
-        result += group.num + " группа";
+        result += group.getNum() + " группа";
         return result;
     }
 }

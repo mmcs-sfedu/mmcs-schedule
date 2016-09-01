@@ -6,6 +6,6 @@ import com.nolan.mmcs_schedule.ui.schedule_activity.CustomArrayAdapter;
 public class TeacherAdapter extends CustomArrayAdapter<Teacher> {
     @Override
     protected String str(Teacher teacher) {
-        return teacher.name;
+        return teacher.getName();
     }
 }

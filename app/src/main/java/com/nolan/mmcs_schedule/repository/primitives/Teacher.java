@@ -6,8 +6,8 @@ import java.io.Serializable;
 import java.util.ArrayList;
 
 public class Teacher {
-    public final int id;
-    public final String name;
+    private int id;
+    private String name;
 
     public Teacher(RawTeacher rawTeacher) {
         id = rawTeacher.getId();
@@ -15,4 +15,12 @@ public class Teacher {
     }
 
     public static class List extends ArrayList<Teacher> { }
+
+    public int getId() {
+        return id;
+    }
+
+    public String getName() {
+        return name;
+    }
 }

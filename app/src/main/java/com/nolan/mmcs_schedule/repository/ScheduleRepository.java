@@ -12,8 +12,11 @@ import com.nolan.mmcs_schedule.repository.primitives.TeacherSchedule;
 import com.nolan.mmcs_schedule.repository.primitives.WeekType;
 import com.octo.android.robospice.SpiceManager;
 import com.octo.android.robospice.persistence.DurationInMillis;
+import com.octo.android.robospice.persistence.exception.CacheCreationException;
 import com.octo.android.robospice.request.listener.RequestListener;
 import com.octo.android.robospice.request.retrofit.RetrofitSpiceRequest;
+
+import java.util.concurrent.ExecutionException;
 
 public class ScheduleRepository {
 
@@ -110,10 +113,12 @@ public class ScheduleRepository {
     }
 
     public void getScheduleOfGroup(final int groupId, RequestListener<GroupSchedule> listener) {
-        spiceManager.execute(new ScheduleOfGroupRequest(groupId), "getScheduleOfGroup(" + groupId + ")", CACHE_EXPIRY_DURATION, listener);
+        spiceManager.execute(new ScheduleOfGroupRequest(groupId),
+                "getScheduleOfGroup(" + groupId + ")", CACHE_EXPIRY_DURATION, listener);
     }
 
-    private static class ScheduleOfTeacherRequest extends RetrofitSpiceRequest<TeacherSchedule, ScheduleApi> {
+    private static class ScheduleOfTeacherRequest
+            extends RetrofitSpiceRequest<TeacherSchedule, ScheduleApi> {
         private int teacherId;
 
         public ScheduleOfTeacherRequest(int teacherId) {
@@ -128,7 +133,8 @@ public class ScheduleRepository {
     }
 
     public void getScheduleOfTeacher(int teacherId, RequestListener<TeacherSchedule> listener) {
-        spiceManager.execute(new ScheduleOfTeacherRequest(teacherId), "getScheduleOfTeacher(" + teacherId + ")", CACHE_EXPIRY_DURATION, listener);
+        spiceManager.execute(new ScheduleOfTeacherRequest(teacherId),
+                "getScheduleOfTeacher(" + teacherId + ")", CACHE_EXPIRY_DURATION, listener);
     }
 
     private static class WeekTypeRequest extends RetrofitSpiceRequest<WeekType, ScheduleApi> {
@@ -143,7 +149,8 @@ public class ScheduleRepository {
     }
 
     public void getCurrentWeekType(RequestListener<WeekType> listener) {
-        spiceManager.execute(new WeekTypeRequest(), "getCurrentWeekType()", CACHE_EXPIRY_DURATION, listener);
+        spiceManager.execute(new WeekTypeRequest(), "getCurrentWeekType()",
+                CACHE_EXPIRY_DURATION, listener);
     }
 }
 
