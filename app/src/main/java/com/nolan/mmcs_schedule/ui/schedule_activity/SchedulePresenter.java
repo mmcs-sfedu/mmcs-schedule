@@ -54,14 +54,14 @@ public class SchedulePresenter {
     public void onWeekTypeOptionChanged(WeekTypeOption weekTypeOption) {
         preferences.setWeekTypeOption(weekTypeOption);
         weekType = getWeekType(weekTypeOption);
-        view.setSubtitle(getSubtitle(weekType));
+        view.setSubtitle(getSubtitle(weekTypeOption));
         view.changeWeekType(weekType);
     }
 
     private static String str(WeekType weekType) {
         switch (weekType) {
-            case UPPER: return "верхняя неделя";
-            case LOWER: return "нижняя неделя";
+            case UPPER: return "верхняя";
+            case LOWER: return "нижняя";
             case FULL: return "";
         }
         throw new Error("unreachable statement");
@@ -72,12 +72,12 @@ public class SchedulePresenter {
             "Пятница", "Суббота", "Воскресенье"
     };
 
-    private String getSubtitle(WeekType weekType) {
-        if (weekType == null) return "";
-        switch (weekType) {
-            case UPPER: return "Верхняя неделя";
-            case LOWER: return "Нижняя неделя";
-            case FULL: return "Полное расписание";
+    private String getSubtitle(WeekTypeOption weekTypeOption) {
+        switch (weekTypeOption) {
+            case CURRENT: return "текущая \"" + str(currentWeek) + "\"";
+            case FULL: return str(WeekType.FULL);
+            case UPPER: return str(WeekType.UPPER);
+            case LOWER: return str(WeekType.LOWER);
             default:
                 throw new Error("unreachable statement");
         }
@@ -96,7 +96,7 @@ public class SchedulePresenter {
                 currentWeek = weekType;
                 WeekTypeOption weekTypeOption = preferences.getWeekTypeOption();
                 SchedulePresenter.this.weekType = getWeekType(weekTypeOption);
-                view.setSubtitle(getSubtitle(SchedulePresenter.this.weekType));
+                view.setSubtitle(getSubtitle(weekTypeOption));
                 view.changeWeekType(weekType);
                 getWeekTypeDone(pickedScheduleOfGroup, id, listener);
             }
@@ -145,13 +145,21 @@ public class SchedulePresenter {
             ArrayList<Lesson> lessonsUpper = new ArrayList<>();
             ArrayList<Lesson> lessonsLower = new ArrayList<>();
             for (GroupLesson lesson : groupSchedule.getLessons().get(i)) {
+                String weekType;
+                switch (lesson.getWeekType()) {
+                    case FULL:  weekType = "";               break;
+                    case LOWER: weekType = "нижняя неделя";  break;
+                    case UPPER: weekType = "верхняя неделя"; break;
+                    default:
+                        throw new Error("unreachable statement");
+                }
                 Lesson textual = new Lesson(
                         lesson.getPeriod().getBegin().toString(),
                         lesson.getPeriod().getEnd().toString(),
                         lesson.getSubjectName(),
                         TextUtils.join(", ", lesson.getRooms()),
                         TextUtils.join("\n", lesson.getTeachers()),
-                        str(lesson.getWeekType()));
+                        weekType);
                 lessonsFull.add(textual);
                 if (lesson.getWeekType() != WeekType.LOWER) {
                     lessonsUpper.add(textual);

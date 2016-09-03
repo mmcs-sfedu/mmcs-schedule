@@ -150,7 +150,7 @@ public class ScheduleRepository {
 
     public void getCurrentWeekType(RequestListener<WeekType> listener) {
         spiceManager.execute(new WeekTypeRequest(), "getCurrentWeekType()",
-                CACHE_EXPIRY_DURATION, listener);
+                10 * DurationInMillis.ONE_HOUR, listener);
     }
 }
 

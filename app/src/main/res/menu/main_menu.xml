@@ -22,11 +22,11 @@
 
             <item
                 android:id="@+id/mi_show_upper"
-                android:title="Только нижняя" />
+                android:title="Только верхняя" />
 
             <item
                 android:id="@+id/mi_show_lower"
-                android:title="Только верхняя" />
+                android:title="Только нижняя" />
 
             <item
                 android:id="@+id/mi_show_full"
