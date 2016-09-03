@@ -16,7 +16,7 @@ public class UtilsPreferences {
     }
 
     /**
-     * Has use chosen schedule?
+     * Has user chosen schedule?
      */
     private static final String KEY_SCHEDULE_WAS_PICKED = "schedule-was-picked";
     public boolean getScheduleWasPicked() {
