@@ -8,8 +8,8 @@ android {
         applicationId "com.nolan.mmcs_schedule"
         minSdkVersion 15
         targetSdkVersion 24
-        versionCode 9
-        versionName "1.4.5"
+        versionCode 10
+        versionName "1.4.6"
     }
     buildTypes {
         debug {
