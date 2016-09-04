@@ -1,13 +1,10 @@
 package com.nolan.mmcs_schedule.ui.schedule_activity;
 
-import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.v7.app.AlertDialog;
-import android.support.v7.app.AppCompatDialogFragment;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -120,6 +117,9 @@ public class ScheduleActivity extends BaseActivity implements SchedulePresenter.
             case R.id.mi_show_lower:
                 presenter.onWeekTypeOptionChanged(WeekTypeOption.LOWER);
                 break;
+            case R.id.mi_report_error:
+                presenter.onReportError();
+                break;
         }
         return true;
     }
@@ -132,6 +132,15 @@ public class ScheduleActivity extends BaseActivity implements SchedulePresenter.
     private void showSchedule() {
         pbLoading.setVisibility(View.GONE);
         lvSchedule.setVisibility(View.VISIBLE);
+    }
+
+    @Override
+    public void startReportErrorActivity(String subject, String text) {
+        Intent emailIntent = new Intent(Intent.ACTION_SENDTO, Uri.fromParts(
+                "mailto","yadummer+schedule@gmail.com", null));
+        emailIntent.putExtra(Intent.EXTRA_SUBJECT, subject);
+        emailIntent.putExtra(Intent.EXTRA_TEXT, text);
+        startActivity(Intent.createChooser(emailIntent, "Отправить письмо..."));
     }
 
     @Override

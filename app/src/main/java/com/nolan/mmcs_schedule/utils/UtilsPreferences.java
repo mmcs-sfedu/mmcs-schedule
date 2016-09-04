@@ -2,7 +2,7 @@ package com.nolan.mmcs_schedule.utils;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.util.Log;
+import android.net.Uri;
 
 import com.nolan.mmcs_schedule.ScheduleApplication;
 import com.nolan.mmcs_schedule.ui.schedule_activity.WeekTypeOption;
@@ -99,5 +99,17 @@ public class UtilsPreferences {
                 .putString(KEY_WEEK_TYPE_OPTION, weekType.toString())
                 .apply();
     }
+
+    private static final String KEY_REPORT_ERROR_URI = "report-error-uri";
+    public String getReportErrorUri() {
+        return getPreferences().getString(KEY_REPORT_ERROR_URI, null);
+    }
+    public void setReportErrorUri(String uri) {
+        getPreferences()
+                .edit()
+                .putString(KEY_REPORT_ERROR_URI, uri)
+                .apply();
+    }
+
 
 }

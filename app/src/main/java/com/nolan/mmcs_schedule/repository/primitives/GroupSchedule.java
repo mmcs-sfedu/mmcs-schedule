@@ -5,7 +5,6 @@ import com.nolan.mmcs_schedule.repository.api.primitives.RawLesson;
 import com.nolan.mmcs_schedule.repository.api.primitives.RawScheduleOfGroup;
 
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.TreeMap;
 import java.util.TreeSet;
 

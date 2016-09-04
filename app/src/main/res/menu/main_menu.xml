@@ -36,4 +36,8 @@
 
     </item>
 
+    <item
+        android:id="@+id/mi_report_error"
+        android:title="Сообщить об ошибке" />
+
 </menu>

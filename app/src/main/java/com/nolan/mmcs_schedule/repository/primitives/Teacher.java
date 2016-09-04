@@ -2,7 +2,6 @@ package com.nolan.mmcs_schedule.repository.primitives;
 
 import com.nolan.mmcs_schedule.repository.api.primitives.RawTeacher;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 
 public class Teacher {

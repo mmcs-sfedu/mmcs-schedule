@@ -18,9 +18,10 @@ import java.util.ArrayList;
 
 public class SchedulePresenter {
     public interface View {
-        void startPickScheduleActivity();
         void setSubtitle(String subtitle);
         void changeWeekType(WeekType weekType);
+        void startReportErrorActivity(String subject, String text);
+        void startPickScheduleActivity();
     }
 
     private View view;
@@ -116,7 +117,6 @@ public class SchedulePresenter {
                 public void onRequestSuccess(GroupSchedule groupSchedule) {
                     Gson gson = new Gson();
                     String json = gson.toJson(groupSchedule);
-                    Log.i("json", json);
                     GroupSchedule groupSchedule1 = gson.fromJson(json, GroupSchedule.class);
                     listener.onRequestSuccess(groupScheduleToAdapterData(groupSchedule1));
                 }
@@ -216,5 +216,11 @@ public class SchedulePresenter {
             }
         }
         return new ScheduleAdapter.Data(scheduleFull, scheduleUpper, scheduleLower);
+    }
+
+    public void onReportError() {
+        String subject = "Ошибка в расписании";
+        // todo: Fill text with grade,group/teacher name information
+        view.startReportErrorActivity(subject, "");
     }
 }

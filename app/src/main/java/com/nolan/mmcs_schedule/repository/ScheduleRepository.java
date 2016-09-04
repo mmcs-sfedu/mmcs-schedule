@@ -12,11 +12,8 @@ import com.nolan.mmcs_schedule.repository.primitives.TeacherSchedule;
 import com.nolan.mmcs_schedule.repository.primitives.WeekType;
 import com.octo.android.robospice.SpiceManager;
 import com.octo.android.robospice.persistence.DurationInMillis;
-import com.octo.android.robospice.persistence.exception.CacheCreationException;
 import com.octo.android.robospice.request.listener.RequestListener;
 import com.octo.android.robospice.request.retrofit.RetrofitSpiceRequest;
-
-import java.util.concurrent.ExecutionException;
 
 public class ScheduleRepository {
 

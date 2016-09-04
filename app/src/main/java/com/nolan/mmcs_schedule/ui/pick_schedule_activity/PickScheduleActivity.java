@@ -3,8 +3,6 @@ package com.nolan.mmcs_schedule.ui.pick_schedule_activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Looper;
 import android.support.annotation.Nullable;
 import android.util.Log;
 import android.view.View;
@@ -90,7 +88,6 @@ public class PickScheduleActivity extends BaseActivity implements PickSchedulePr
         spGrade.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
-                Log.i("tag", "grade selected");
                 showGradeOption();
                 Grade grade = gradeAdapter.getItem(i);
                 presenter.getGroups(grade.id, grade.num, new RequestListener<Group.List>() {
