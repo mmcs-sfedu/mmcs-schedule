@@ -120,7 +120,7 @@ public class PickSchedulePresenter {
             if (null != pickedGroup.getName()) {
                 title += pickedGroup.getName() + " ";
             }
-            title += "группа " + pickedGrade.getNum() + "." + pickedGroup.getNum();
+            title += pickedGrade.getNum() + "." + pickedGroup.getNum();
             preferences.setTitle(title);
         } else {
             preferences.setTeacherId(pickedTeacher.getId());
