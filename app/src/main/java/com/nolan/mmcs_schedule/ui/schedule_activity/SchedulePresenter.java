@@ -154,7 +154,7 @@ public class SchedulePresenter {
                         lesson.getPeriod().getBegin().toString(),
                         lesson.getPeriod().getEnd().toString(),
                         lesson.getSubjectName(),
-                        TextUtils.join(", ", lesson.getRooms()),
+                        "",
                         TextUtils.join("\n", lesson.getTeachers()),
                         weekTypeToString(lesson.getWeekType()));
                 lessonsFull.add(textual);

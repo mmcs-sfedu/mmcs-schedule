@@ -34,17 +34,18 @@ public class GroupSchedule {
             WeekType weekType = lessonTime.getWeekType();
             String subjectName = curricula.get(0).getSubjectName();
             TreeSet<String> teachers = new TreeSet<>();
-            ArrayList<String> rooms = new ArrayList<>();
             for (RawCurriculum curriculum : curricula) {
-                teachers.add(curriculum.getTeacherName());
                 String roomName = curriculum.getRoomName();
+                String teacher = "";
                 if (!roomName.isEmpty()) {
-                    rooms.add("а." + roomName);
+                    teacher = "а." + roomName + " ";
                 }
+                teacher += curriculum.getTeacherName();
+                teachers.add(teacher);
             }
             int dayOfWeek = lessonTime.getDayOfWeek();
             lessons.get(dayOfWeek).add(new GroupLesson(
-                    period, weekType, subjectName, teachers, rooms));
+                    period, weekType, subjectName, teachers));
         }
     }
 

@@ -1,6 +1,5 @@
 package com.nolan.mmcs_schedule.repository.primitives;
 
-import java.util.ArrayList;
 import java.util.TreeSet;
 
 public class GroupLesson implements Comparable<GroupLesson> {
@@ -8,15 +7,13 @@ public class GroupLesson implements Comparable<GroupLesson> {
     private final WeekType weekType;
     private final String subjectName;
     private final TreeSet<String> teachers;
-    private final ArrayList<String> rooms;
 
     public GroupLesson(LessonPeriod period, WeekType weekType, String subjectName,
-                       TreeSet<String> teachers, ArrayList<String> rooms) {
+                       TreeSet<String> teachers) {
         this.period = period;
         this.weekType = weekType;
         this.subjectName = subjectName;
         this.teachers = teachers;
-        this.rooms = rooms;
     }
 
     @Override
@@ -26,8 +23,7 @@ public class GroupLesson implements Comparable<GroupLesson> {
         return period.equals(another.period) &&
                 weekType.equals(another.weekType) &&
                 subjectName.equals(another.subjectName) &&
-                teachers.equals(another.teachers) &&
-                rooms.equals(another.rooms);
+                teachers.equals(another.teachers);
     }
 
     @Override
@@ -50,8 +46,5 @@ public class GroupLesson implements Comparable<GroupLesson> {
     public TreeSet<String> getTeachers() {
         return teachers;
     }
-
-    public ArrayList<String> getRooms() {
-        return rooms;
-    }
 }
+
