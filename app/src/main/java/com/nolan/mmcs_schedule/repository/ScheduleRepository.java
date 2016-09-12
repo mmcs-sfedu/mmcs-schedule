@@ -47,15 +47,8 @@ public class ScheduleRepository {
         }
     }
 
-    public void getGrades(final RequestListener<Grade.List> listener) {
-        Handler handler = new Handler(Looper.getMainLooper());
-        handler.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-
-                spiceManager.execute(new GradesRequest(), "getGrades()", CACHE_EXPIRY_DURATION, listener);
-            }
-        }, 1000);
+    public void getGrades(RequestListener<Grade.List> listener) {
+        spiceManager.execute(new GradesRequest(), "getGrades()", CACHE_EXPIRY_DURATION, listener);
     }
 
     private static class GroupsRequest extends RetrofitSpiceRequest<Group.List, ScheduleApi> {
@@ -104,14 +97,7 @@ public class ScheduleRepository {
     }
 
     public void getTeachers(final RequestListener<Teacher.List> listener) {
-        Handler handler = new Handler(Looper.getMainLooper());
-        handler.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-
-                spiceManager.execute(new TeachersRequest(), "getTeachers", CACHE_EXPIRY_DURATION, listener);
-            }
-        }, 1000);
+        spiceManager.execute(new TeachersRequest(), "getTeachers", CACHE_EXPIRY_DURATION, listener);
     }
 
     private static class ScheduleOfGroupRequest extends RetrofitSpiceRequest<GroupSchedule, ScheduleApi> {
