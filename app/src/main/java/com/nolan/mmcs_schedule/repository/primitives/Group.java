@@ -34,4 +34,9 @@ public class Group {
     public int getGradeNum() {
         return gradeNum;
     }
+
+    @Override
+    public String toString() {
+        return (name != null ? name + " " : "") + "группа " + num;
+    }
 }

@@ -1,5 +1,8 @@
 package com.nolan.mmcs_schedule.repository;
 
+import android.os.Handler;
+import android.os.Looper;
+
 import com.nolan.mmcs_schedule.repository.api.ScheduleApi;
 import com.nolan.mmcs_schedule.repository.api.primitives.RawGrade;
 import com.nolan.mmcs_schedule.repository.api.primitives.RawGroup;
@@ -14,6 +17,8 @@ import com.octo.android.robospice.SpiceManager;
 import com.octo.android.robospice.persistence.DurationInMillis;
 import com.octo.android.robospice.request.listener.RequestListener;
 import com.octo.android.robospice.request.retrofit.RetrofitSpiceRequest;
+
+import java.util.Calendar;
 
 public class ScheduleRepository {
 
@@ -42,8 +47,15 @@ public class ScheduleRepository {
         }
     }
 
-    public void getGrades(RequestListener<Grade.List> listener) {
-        spiceManager.execute(new GradesRequest(), "getGrades()", CACHE_EXPIRY_DURATION, listener);
+    public void getGrades(final RequestListener<Grade.List> listener) {
+        Handler handler = new Handler(Looper.getMainLooper());
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+
+                spiceManager.execute(new GradesRequest(), "getGrades()", CACHE_EXPIRY_DURATION, listener);
+            }
+        }, 1000);
     }
 
     private static class GroupsRequest extends RetrofitSpiceRequest<Group.List, ScheduleApi> {
@@ -91,8 +103,15 @@ public class ScheduleRepository {
         }
     }
 
-    public void getTeachers(RequestListener<Teacher.List> listener) {
-        spiceManager.execute(new TeachersRequest(), "getTeachers", CACHE_EXPIRY_DURATION, listener);
+    public void getTeachers(final RequestListener<Teacher.List> listener) {
+        Handler handler = new Handler(Looper.getMainLooper());
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+
+                spiceManager.execute(new TeachersRequest(), "getTeachers", CACHE_EXPIRY_DURATION, listener);
+            }
+        }, 1000);
     }
 
     private static class ScheduleOfGroupRequest extends RetrofitSpiceRequest<GroupSchedule, ScheduleApi> {
@@ -146,8 +165,17 @@ public class ScheduleRepository {
     }
 
     public void getCurrentWeekType(RequestListener<WeekType> listener) {
-        spiceManager.execute(new WeekTypeRequest(), "getCurrentWeekType()",
-                10 * DurationInMillis.ONE_HOUR, listener);
+
+        // http://stackoverflow.com/a/11989680/4626533 © Denys Séguret
+        Calendar c = Calendar.getInstance();
+        c.add(Calendar.DAY_OF_MONTH, 1);
+        c.set(Calendar.HOUR_OF_DAY, 0);
+        c.set(Calendar.MINUTE, 0);
+        c.set(Calendar.SECOND, 0);
+        c.set(Calendar.MILLISECOND, 0);
+        long untilMidnight = (c.getTimeInMillis() - System.currentTimeMillis());
+
+        spiceManager.execute(new WeekTypeRequest(), "getCurrentWeekType()", untilMidnight, listener);
     }
 }
 

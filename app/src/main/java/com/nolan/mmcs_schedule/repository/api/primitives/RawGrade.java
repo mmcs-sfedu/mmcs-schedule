@@ -14,6 +14,16 @@ public class RawGrade
         @SerializedName("bachelor")   BACHELOR,
         @SerializedName("master")     MASTER,
         @SerializedName("specialist") SPECIALIST;
+
+        @Override
+        public String toString() {
+            switch (this) {
+                case BACHELOR: return "Бакалавриат";
+                case MASTER: return "Магистратура";
+                case SPECIALIST: return "Специалитет";
+                default: throw new Error("unreachable statement");
+            }
+        }
     }
 
     private int    id     = -1;

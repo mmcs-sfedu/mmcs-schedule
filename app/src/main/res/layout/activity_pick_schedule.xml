@@ -13,7 +13,7 @@
         android:orientation="horizontal">
 
         <RadioButton
-            android:id="@+id/rb_student"
+            android:id="@+id/rb_group"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:checked="true"
@@ -28,42 +28,24 @@
 
     </RadioGroup>
 
-    <Spinner
-        android:id="@+id/sp_teacher"
+    <fragment
+        android:id="@+id/f_group"
+        android:name="com.nolan.mmcs_schedule.ui.pick_schedule_activity.GroupFragment"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="8dp"
-        android:visibility="gone" />
+        android:layout_height="wrap_content" />
 
-    <Spinner
-        android:id="@+id/sp_grade"
+    <fragment
+        android:id="@+id/f_teacher"
+        android:name="com.nolan.mmcs_schedule.ui.pick_schedule_activity.TeacherFragment"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="8dp"
-        android:visibility="gone" />
-
-    <Spinner
-        android:id="@+id/sp_group"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="8dp"
-        android:visibility="gone" />
+        android:layout_height="wrap_content" />
 
     <Button
         android:id="@+id/btn_ok"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginRight="16dp"
+        android:layout_margin="16dp"
         android:layout_gravity="right"
-        android:text="@android:string/ok"
-        android:visibility="gone" />
-
-    <ProgressBar
-        android:id="@+id/pb_loading"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:indeterminate="true"
-        android:layout_gravity="center"
-        android:layout_margin="32dp"/>
+        android:text="@android:string/ok" />
 
 </LinearLayout>
