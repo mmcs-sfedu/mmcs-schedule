@@ -5,7 +5,6 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -121,6 +120,7 @@ public class ScheduleActivity extends BaseActivity implements SchedulePresenter.
             case R.id.mi_report_error:
                 presenter.onReportError();
                 break;
+            default: throw new Error("unreachable statement");
         }
         return true;
     }

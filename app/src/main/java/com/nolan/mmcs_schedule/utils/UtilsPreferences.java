@@ -2,7 +2,6 @@ package com.nolan.mmcs_schedule.utils;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.net.Uri;
 
 import com.nolan.mmcs_schedule.ScheduleApplication;
 import com.nolan.mmcs_schedule.ui.schedule_activity.WeekTypeOption;

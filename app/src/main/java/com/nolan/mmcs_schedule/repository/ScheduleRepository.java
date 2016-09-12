@@ -1,8 +1,5 @@
 package com.nolan.mmcs_schedule.repository;
 
-import android.os.Handler;
-import android.os.Looper;
-
 import com.nolan.mmcs_schedule.repository.api.ScheduleApi;
 import com.nolan.mmcs_schedule.repository.api.primitives.RawGrade;
 import com.nolan.mmcs_schedule.repository.api.primitives.RawGroup;

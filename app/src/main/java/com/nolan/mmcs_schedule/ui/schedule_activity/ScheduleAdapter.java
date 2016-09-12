@@ -136,7 +136,7 @@ public class ScheduleAdapter extends BaseAdapter {
         return 0;
     }
 
-    private static void setTextAndSetVisibility(TextView textView, String text) {
+    private static void setTextOrDisappear(TextView textView, String text) {
         textView.setText(text);
         if (text.isEmpty()) {
             textView.setVisibility(View.GONE);
@@ -181,14 +181,11 @@ public class ScheduleAdapter extends BaseAdapter {
             lessonViewHolder.tvBeginTime.setText(lesson.beginTime);
             lessonViewHolder.tvEndTime.setText(lesson.endTime);
             lessonViewHolder.tvPrimaryText.setText(lesson.primaryText);
-            setTextAndSetVisibility(lessonViewHolder.tvSecondaryText, lesson.secondaryText);
-            setTextAndSetVisibility(lessonViewHolder.tvTertiaryText, lesson.tertiaryText);
+            setTextOrDisappear(lessonViewHolder.tvSecondaryText, lesson.secondaryText);
+            setTextOrDisappear(lessonViewHolder.tvTertiaryText, lesson.tertiaryText);
             lessonViewHolder.tvWeekType.setText(lesson.weekType);
-            if (weekType != WeekType.FULL || lesson.weekType.isEmpty()) {
-                lessonViewHolder.tvWeekType.setVisibility(View.GONE);
-            } else {
-                lessonViewHolder.tvWeekType.setVisibility(View.VISIBLE);
-            }
+            lessonViewHolder.tvWeekType.setVisibility(
+                    weekType != WeekType.FULL || lesson.weekType.isEmpty() ? View.GONE : View.VISIBLE);
             lessonViewHolder.vBottomDivider.setVisibility(View.VISIBLE);
         }
         LessonViewHolder lessonViewHolder = (LessonViewHolder)

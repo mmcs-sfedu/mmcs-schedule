@@ -46,6 +46,14 @@ public class RawGroupOfLesson
 
     @Override
     public String toString() {
-        return "" + gradeNum + '.' + groupNum;
+        String str;
+        switch (degree) {
+            case BACHELOR: str = "Бак. "; break;
+            case MASTER: str = "Маг. "; break;
+            case SPECIALIST: str = "Спец. "; break;
+            default: throw new Error("unreachable statement");
+        }
+        str += gradeNum + "." + groupNum;
+        return str;
     }
 }
