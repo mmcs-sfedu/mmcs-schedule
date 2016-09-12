@@ -8,10 +8,10 @@ public class RawScheduleOfTeacher
 
     private List<RawLesson>        lessons   = null;
     private List<RawCurriculum>    curricula = null;
-    private List<RawGroupOfLesson> groups    = null;
+    private List<RawGroupAtLesson> groups    = null;
 
     public RawScheduleOfTeacher(List<RawLesson> lessons, List<RawCurriculum> curricula,
-                                List<RawGroupOfLesson> groups) {
+                                List<RawGroupAtLesson> groups) {
         this.lessons = lessons;
         this.curricula = curricula;
         this.groups = groups;
@@ -25,7 +25,7 @@ public class RawScheduleOfTeacher
         return curricula;
     }
 
-    public List<RawGroupOfLesson> getGroups() {
+    public List<RawGroupAtLesson> getGroups() {
         return groups;
     }
 }

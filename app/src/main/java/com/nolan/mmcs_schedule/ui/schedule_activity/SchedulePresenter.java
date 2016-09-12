@@ -192,7 +192,7 @@ public class SchedulePresenter {
                         lesson.getPeriod().getEnd().toString(),
                         lesson.getSubjectName(),
                         lesson.getRoom(),
-                        TextUtils.join(", ", lesson.getGroups()),
+                        TextUtils.join(",\n", lesson.getGroups()),
                         weekTypeToString(lesson.getWeekType()));
                 lessonsFull.add(textual);
                 if (lesson.getWeekType() != WeekType.LOWER) {
