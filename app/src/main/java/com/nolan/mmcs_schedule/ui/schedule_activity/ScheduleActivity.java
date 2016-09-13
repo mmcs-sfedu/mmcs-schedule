@@ -120,6 +120,8 @@ public class ScheduleActivity extends BaseActivity implements SchedulePresenter.
             case R.id.mi_report_error:
                 presenter.onReportError();
                 break;
+            case R.id.mi_week_type:
+                break;
             default: throw new Error("unreachable statement");
         }
         return true;
