@@ -6,9 +6,9 @@ import com.nolan.mmcs_schedule.repository.api.primitives.RawGroup;
 import com.nolan.mmcs_schedule.repository.api.primitives.RawTeacher;
 import com.nolan.mmcs_schedule.repository.primitives.Grade;
 import com.nolan.mmcs_schedule.repository.primitives.Group;
-import com.nolan.mmcs_schedule.repository.primitives.GroupSchedule;
+import com.nolan.mmcs_schedule.repository.primitives.ScheduleOfGroup;
+import com.nolan.mmcs_schedule.repository.primitives.ScheduleOfTeacher;
 import com.nolan.mmcs_schedule.repository.primitives.Teacher;
-import com.nolan.mmcs_schedule.repository.primitives.TeacherSchedule;
 import com.nolan.mmcs_schedule.repository.primitives.WeekType;
 import com.octo.android.robospice.SpiceManager;
 import com.octo.android.robospice.persistence.DurationInMillis;
@@ -97,41 +97,41 @@ public class ScheduleRepository {
         spiceManager.execute(new TeachersRequest(), "getTeachers", CACHE_EXPIRY_DURATION, listener);
     }
 
-    private static class ScheduleOfGroupRequest extends RetrofitSpiceRequest<GroupSchedule, ScheduleApi> {
+    private static class ScheduleOfGroupRequest extends RetrofitSpiceRequest<ScheduleOfGroup, ScheduleApi> {
         private int groupId;
 
         public ScheduleOfGroupRequest(int groupId) {
-            super(GroupSchedule.class, ScheduleApi.class);
+            super(ScheduleOfGroup.class, ScheduleApi.class);
             this.groupId = groupId;
         }
 
         @Override
-        public GroupSchedule loadDataFromNetwork() throws Exception {
-            return new GroupSchedule(getService().getScheduleOfGroup(groupId));
+        public ScheduleOfGroup loadDataFromNetwork() throws Exception {
+            return new ScheduleOfGroup(getService().getScheduleOfGroup(groupId));
         }
     }
 
-    public void getScheduleOfGroup(final int groupId, RequestListener<GroupSchedule> listener) {
+    public void getScheduleOfGroup(final int groupId, RequestListener<ScheduleOfGroup> listener) {
         spiceManager.execute(new ScheduleOfGroupRequest(groupId),
                 "getScheduleOfGroup(" + groupId + ")", CACHE_EXPIRY_DURATION, listener);
     }
 
     private static class ScheduleOfTeacherRequest
-            extends RetrofitSpiceRequest<TeacherSchedule, ScheduleApi> {
+            extends RetrofitSpiceRequest<ScheduleOfTeacher, ScheduleApi> {
         private int teacherId;
 
         public ScheduleOfTeacherRequest(int teacherId) {
-            super(TeacherSchedule.class, ScheduleApi.class);
+            super(ScheduleOfTeacher.class, ScheduleApi.class);
             this.teacherId = teacherId;
         }
 
         @Override
-        public TeacherSchedule loadDataFromNetwork() throws Exception {
-            return new TeacherSchedule(getService().getScheduleOfTeacher(teacherId));
+        public ScheduleOfTeacher loadDataFromNetwork() throws Exception {
+            return new ScheduleOfTeacher(getService().getScheduleOfTeacher(teacherId));
         }
     }
 
-    public void getScheduleOfTeacher(int teacherId, RequestListener<TeacherSchedule> listener) {
+    public void getScheduleOfTeacher(int teacherId, RequestListener<ScheduleOfTeacher> listener) {
         spiceManager.execute(new ScheduleOfTeacherRequest(teacherId),
                 "getScheduleOfTeacher(" + teacherId + ")", CACHE_EXPIRY_DURATION, listener);
     }

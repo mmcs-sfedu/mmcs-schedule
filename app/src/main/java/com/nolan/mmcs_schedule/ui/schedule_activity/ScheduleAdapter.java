@@ -1,5 +1,6 @@
 package com.nolan.mmcs_schedule.ui.schedule_activity;
 
+import android.support.annotation.NonNull;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -8,18 +9,19 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.nolan.mmcs_schedule.R;
-import com.nolan.mmcs_schedule.repository.primitives.WeekType;
 
 import java.util.ArrayList;
 
 public class ScheduleAdapter extends BaseAdapter {
+    public interface OnLessonClickListener {
+        void onLessonClick(int day, int lesson);
+    }
+
     private static class LessonViewHolder {
         public final View self;
         public final TextView tvBeginTime;
         public final TextView tvEndTime;
         public final TextView tvPrimaryText;
-        public final TextView tvSecondaryText;
-        public final TextView tvTertiaryText;
         public final TextView tvWeekType;
         public final View vBottomDivider;
 
@@ -28,8 +30,6 @@ public class ScheduleAdapter extends BaseAdapter {
             this.tvBeginTime = (TextView) view.findViewById(R.id.tv_begin_time);
             this.tvEndTime = (TextView) view.findViewById(R.id.tv_end_time);
             this.tvPrimaryText = (TextView) view.findViewById(R.id.tv_primary_text);
-            this.tvSecondaryText = (TextView) view.findViewById(R.id.tv_secondary_text);
-            this.tvTertiaryText = (TextView) view.findViewById(R.id.tv_tertiary_text);
             this.tvWeekType = (TextView) view.findViewById(R.id.tv_week_type);
             this.vBottomDivider = view.findViewById(R.id.v_bottom_divider);
         }
@@ -42,30 +42,6 @@ public class ScheduleAdapter extends BaseAdapter {
         public DayViewHolder(View view) {
             this.ll = (LinearLayout) view.findViewById(R.id.ll);
             this.tvDayOfWeek = (TextView) view.findViewById(R.id.tv_day_of_week);
-        }
-    }
-
-    public static class Data {
-        private final ArrayList<DaySchedule> scheduleFull;
-        private final ArrayList<DaySchedule> scheduleUpper;
-        private final ArrayList<DaySchedule> scheduleLower;
-
-        public Data(ArrayList<DaySchedule> scheduleFull,
-                    ArrayList<DaySchedule> scheduleUpper,
-                    ArrayList<DaySchedule> scheduleLower) {
-            this.scheduleFull = scheduleFull;
-            this.scheduleUpper = scheduleUpper;
-            this.scheduleLower = scheduleLower;
-        }
-
-        public ArrayList<DaySchedule> get(WeekType weekType) {
-            switch (weekType) {
-                case FULL: return scheduleFull;
-                case UPPER: return scheduleUpper;
-                case LOWER: return scheduleLower;
-                default:
-                    throw new Error("unreachable statement");
-            }
         }
     }
 
@@ -105,48 +81,41 @@ public class ScheduleAdapter extends BaseAdapter {
         }
     }
 
-    private Data data;
-    private WeekType weekType = WeekType.FULL;
+    @NonNull
+    private OnLessonClickListener listener;
+
+    private ArrayList<DaySchedule> schedule;
     private LessonViewHolderCache lessonViewHolderCache;
 
-    public void setData(Data data) {
-        this.data = data;
-        notifyDataSetChanged();
+    private View.OnClickListener onClickListener = new View.OnClickListener() {
+        @Override
+        public void onClick(View view) {
+            int day = (int) view.getTag(R.id.tag_day);
+            int lesson = (int) view.getTag(R.id.tag_lesson);
+            listener.onLessonClick(day, lesson);
+        }
+    };
+
+    public ScheduleAdapter(@NonNull OnLessonClickListener listener) {
+        super();
+        this.listener = listener;
     }
 
-    public void setWeekType(WeekType weekType) {
-        this.weekType = weekType;
+    public void setData(ArrayList<DaySchedule> schedule) {
+        this.schedule = schedule;
         notifyDataSetChanged();
     }
 
     @Override
     public int getCount() {
-        if (data == null) return 0;
-        ArrayList<DaySchedule> schedule = data.get(weekType);
         return schedule == null ? 0 : schedule.size();
     }
 
-    @Override
-    public Object getItem(int i) {
-        return null;
-    }
+    @Override public Object getItem(int i) { return null; }
+    @Override public long getItemId(int i) { return 0; }
 
     @Override
-    public long getItemId(int i) {
-        return 0;
-    }
-
-    private static void setTextOrDisappear(TextView textView, String text) {
-        textView.setText(text);
-        if (text.isEmpty()) {
-            textView.setVisibility(View.GONE);
-        } else {
-            textView.setVisibility(View.VISIBLE);
-        }
-    }
-
-    @Override
-    public View getView(int i, View view, ViewGroup viewGroup) {
+    public View getView(final int i, View view, ViewGroup viewGroup) {
         if (lessonViewHolderCache == null) {
             lessonViewHolderCache =
                     new LessonViewHolderCache(LayoutInflater.from(viewGroup.getContext()));
@@ -161,7 +130,7 @@ public class ScheduleAdapter extends BaseAdapter {
         if (dayViewHolder == null) {
             dayViewHolder = (DayViewHolder) view.getTag();
         }
-        DaySchedule daySchedule = data.get(weekType).get(i);
+        DaySchedule daySchedule = schedule.get(i);
         dayViewHolder.tvDayOfWeek.setText(daySchedule.dayOfWeek);
         if (dayViewHolder.ll.getChildCount() - 2 < daySchedule.lessons.size()) {
             for (int j = dayViewHolder.ll.getChildCount() - 2; j < daySchedule.lessons.size(); ++j) {
@@ -174,23 +143,22 @@ public class ScheduleAdapter extends BaseAdapter {
             }
         }
         for (int j = 0; j < daySchedule.lessons.size(); ++j) {
-            LessonViewHolder lessonViewHolder =
-                    (LessonViewHolder) dayViewHolder.ll.getChildAt(j + 2).getTag();
+            LessonViewHolder lvh = (LessonViewHolder) dayViewHolder.ll.getChildAt(j + 2).getTag();
             Lesson lesson = daySchedule.lessons.get(j);
-            lessonViewHolder.self.setVisibility(View.VISIBLE);
-            lessonViewHolder.tvBeginTime.setText(lesson.beginTime);
-            lessonViewHolder.tvEndTime.setText(lesson.endTime);
-            lessonViewHolder.tvPrimaryText.setText(lesson.primaryText);
-            setTextOrDisappear(lessonViewHolder.tvSecondaryText, lesson.secondaryText);
-            setTextOrDisappear(lessonViewHolder.tvTertiaryText, lesson.tertiaryText);
-            lessonViewHolder.tvWeekType.setText(lesson.weekType);
-            lessonViewHolder.tvWeekType.setVisibility(
-                    weekType != WeekType.FULL || lesson.weekType.isEmpty() ? View.GONE : View.VISIBLE);
-            lessonViewHolder.vBottomDivider.setVisibility(View.VISIBLE);
+            lvh.self.setTag(R.id.tag_day, i);
+            lvh.self.setTag(R.id.tag_lesson, j);
+            lvh.self.setOnClickListener(onClickListener);
+            lvh.self.setVisibility(View.VISIBLE);
+            lvh.tvBeginTime.setText(lesson.beginTime);
+            lvh.tvEndTime.setText(lesson.endTime);
+            lvh.tvPrimaryText.setText(lesson.primaryText);
+            lvh.tvWeekType.setText(lesson.weekType);
+            lvh.tvWeekType.setVisibility(lesson.weekType.isEmpty() ? View.GONE : View.VISIBLE);
+            lvh.vBottomDivider.setVisibility(View.VISIBLE);
         }
-        LessonViewHolder lessonViewHolder = (LessonViewHolder)
+        LessonViewHolder lastViewHolder = (LessonViewHolder)
                 dayViewHolder.ll.getChildAt(daySchedule.lessons.size() + 1).getTag();
-        lessonViewHolder.vBottomDivider.setVisibility(View.GONE);
+        lastViewHolder.vBottomDivider.setVisibility(View.GONE);
         return view;
     }
 }

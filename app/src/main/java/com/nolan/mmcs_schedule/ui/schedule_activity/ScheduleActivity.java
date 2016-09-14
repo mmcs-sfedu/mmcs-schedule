@@ -15,24 +15,21 @@ import android.widget.Toast;
 import com.nolan.mmcs_schedule.Injector;
 import com.nolan.mmcs_schedule.R;
 import com.nolan.mmcs_schedule.repository.ScheduleRepository;
-import com.nolan.mmcs_schedule.repository.primitives.WeekType;
 import com.nolan.mmcs_schedule.ui.BaseActivity;
+import com.nolan.mmcs_schedule.ui.schedule_activity.lesson_dialog.LessonDetails;
+import com.nolan.mmcs_schedule.ui.schedule_activity.lesson_dialog.LessonDetailsDialog;
 import com.nolan.mmcs_schedule.ui.pick_schedule_activity.PickScheduleActivity;
 import com.nolan.mmcs_schedule.utils.UtilsPreferences;
-import com.octo.android.robospice.persistence.exception.SpiceException;
-import com.octo.android.robospice.request.listener.RequestListener;
+
+import java.util.ArrayList;
 
 public class ScheduleActivity extends BaseActivity implements SchedulePresenter.View {
     private ProgressBar pbLoading;
     private ListView lvSchedule;
 
-    private ScheduleAdapter adapter = new ScheduleAdapter();
+    private ScheduleAdapter adapter;
 
     private SchedulePresenter presenter;
-    private UtilsPreferences preferences;
-
-    private boolean pickedScheduleOfGroup;
-    private int scheduleId;
 
     public static void start(Context context) {
         context.startActivity(new Intent(context, ScheduleActivity.class));
@@ -46,15 +43,13 @@ public class ScheduleActivity extends BaseActivity implements SchedulePresenter.
         pbLoading = (ProgressBar) findViewById(R.id.pb_loading);
         lvSchedule = (ListView) findViewById(R.id.lv_schedule);
 
-        lvSchedule.setAdapter(adapter);
-
-        preferences = Injector.injectPreferences();
+        UtilsPreferences preferences = Injector.injectPreferences();
         ScheduleRepository repository = Injector.injectRepository(this);
 
-        pickedScheduleOfGroup = preferences.getPickedScheduleOfGroup();
-        scheduleId = pickedScheduleOfGroup ? preferences.getGroupId() : preferences.getTeacherId();
-
         presenter = new SchedulePresenter(this, repository, preferences);
+
+        adapter = new ScheduleAdapter(presenter);
+        lvSchedule.setAdapter(adapter);
 
         setTitle(preferences.getTitle());
     }
@@ -65,32 +60,21 @@ public class ScheduleActivity extends BaseActivity implements SchedulePresenter.
     }
 
     @Override
-    public void changeWeekType(WeekType weekType) {
-        adapter.setWeekType(weekType);
+    public void setSchedule(ArrayList<DaySchedule> schedule) {
+        adapter.setData(schedule);
+        showSchedule();
+    }
+
+    @Override
+    public void showLessonDetails(LessonDetails details) {
+        LessonDetailsDialog.create(details).show(getSupportFragmentManager(), "lesson-details");
     }
 
     @Override
     protected void onStart() {
         super.onStart();
-
+        presenter.start();
         showLoading();
-        presenter.getSchedule(pickedScheduleOfGroup, scheduleId,
-                new RequestListener<ScheduleAdapter.Data>() {
-                    @Override
-                    public void onRequestFailure(SpiceException spiceException) {
-                        Toast.makeText(
-                                ScheduleActivity.this,
-                                "Ошибка при загрузке расписания",
-                                Toast.LENGTH_LONG).show();
-                        preferences.setScheduleWasPicked(false);
-                    }
-
-                    @Override
-                    public void onRequestSuccess(ScheduleAdapter.Data schedule) {
-                        adapter.setData(schedule);
-                        showSchedule();
-                    }
-                });
     }
 
     @Override
@@ -122,7 +106,8 @@ public class ScheduleActivity extends BaseActivity implements SchedulePresenter.
                 break;
             case R.id.mi_week_type:
                 break;
-            default: throw new Error("unreachable statement");
+            default:
+                throw new Error("unreachable statement");
         }
         return true;
     }
@@ -140,7 +125,7 @@ public class ScheduleActivity extends BaseActivity implements SchedulePresenter.
     @Override
     public void startReportErrorActivity(String subject, String text) {
         Intent emailIntent = new Intent(Intent.ACTION_SENDTO, Uri.fromParts(
-                "mailto","yadummer+schedule@gmail.com", null));
+                "mailto", "yadummer+schedule@gmail.com", null));
         emailIntent.putExtra(Intent.EXTRA_SUBJECT, subject);
         emailIntent.putExtra(Intent.EXTRA_TEXT, text);
         startActivity(Intent.createChooser(emailIntent, "Отправить письмо..."));
@@ -151,4 +136,10 @@ public class ScheduleActivity extends BaseActivity implements SchedulePresenter.
         PickScheduleActivity.start(this);
         finish();
     }
+
+    @Override
+    public void onError(String message) {
+        Toast.makeText(ScheduleActivity.this, message, Toast.LENGTH_SHORT).show();
+    }
 }
+

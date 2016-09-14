@@ -1,17 +1,20 @@
 package com.nolan.mmcs_schedule.repository.primitives;
 
+import android.util.Pair;
+
 import com.nolan.mmcs_schedule.repository.api.primitives.RawCurriculum;
 import com.nolan.mmcs_schedule.repository.api.primitives.RawLesson;
 import com.nolan.mmcs_schedule.repository.api.primitives.RawScheduleOfGroup;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.TreeMap;
-import java.util.TreeSet;
 
-public class GroupSchedule {
-    private ArrayList<TreeSet<GroupLesson>> lessons;
+public class ScheduleOfGroup {
+    private ArrayList<ArrayList<LessonForGroup>> days;
 
-    public GroupSchedule(RawScheduleOfGroup rawScheduleOfGroup) {
+    public ScheduleOfGroup(RawScheduleOfGroup rawScheduleOfGroup) {
         TreeMap<Integer, ArrayList<RawCurriculum>> lessonIdToCurricula = new TreeMap<>();
         for (RawCurriculum rawCurriculum : rawScheduleOfGroup.getCurricula()) {
             int lessonId = rawCurriculum.getLessonId();
@@ -22,9 +25,9 @@ public class GroupSchedule {
             }
             curricula.add(rawCurriculum);
         }
-        lessons = new ArrayList<>(7);
+        days = new ArrayList<>(7);
         for (int i = 0; i < 7; ++i) {
-            lessons.add(new TreeSet<GroupLesson>());
+            days.add(new ArrayList<LessonForGroup>());
         }
         for (RawLesson rawLesson : rawScheduleOfGroup.getLessons()) {
             ArrayList<RawCurriculum> curricula = lessonIdToCurricula.get(rawLesson.getId());
@@ -33,23 +36,24 @@ public class GroupSchedule {
             LessonPeriod period = lessonTime.getPeriod();
             WeekType weekType = lessonTime.getWeekType();
             String subjectName = curricula.get(0).getSubjectName();
-            TreeSet<String> teachers = new TreeSet<>();
+            ArrayList<Pair<String, String>> roomsAndTeachers = new ArrayList<>();
             for (RawCurriculum curriculum : curricula) {
-                String roomName = curriculum.getRoomName();
-                String teacher = "";
-                if (!roomName.isEmpty()) {
-                    teacher = "а." + roomName + " ";
-                }
-                teacher += curriculum.getTeacherName();
-                teachers.add(teacher);
+                roomsAndTeachers.add(
+                        new Pair<>(curriculum.getRoomName(), curriculum.getTeacherName()));
             }
             int dayOfWeek = lessonTime.getDayOfWeek();
-            lessons.get(dayOfWeek).add(new GroupLesson(
-                    period, weekType, subjectName, teachers));
+            days.get(dayOfWeek).add(new LessonForGroup(
+                    period, weekType, subjectName, roomsAndTeachers));
+        }
+        for (ArrayList<LessonForGroup> lessons : days) {
+            Collections.sort(lessons, new Comparator<LessonForGroup>() {
+                @Override
+                public int compare(LessonForGroup lhs, LessonForGroup rhs) {
+                    return lhs.getPeriod().getBegin().getHour() - rhs.getPeriod().getBegin().getHour();
+                }
+            });
         }
     }
 
-    public ArrayList<TreeSet<GroupLesson>> getLessons() {
-        return lessons;
-    }
+    public ArrayList<ArrayList<LessonForGroup>> getDays() { return days; }
 }

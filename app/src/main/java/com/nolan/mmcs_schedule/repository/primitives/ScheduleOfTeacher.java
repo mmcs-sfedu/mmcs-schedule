@@ -6,15 +6,16 @@ import com.nolan.mmcs_schedule.repository.api.primitives.RawLesson;
 import com.nolan.mmcs_schedule.repository.api.primitives.RawScheduleOfTeacher;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
-public class TeacherSchedule {
-    private ArrayList<TreeSet<TeacherLesson>> lessons;
+public class ScheduleOfTeacher {
+    private ArrayList<ArrayList<LessonForTeacher>> days;
 
-    public TeacherSchedule(RawScheduleOfTeacher scheduleOfTeacher) {
+    public ScheduleOfTeacher(RawScheduleOfTeacher scheduleOfTeacher) {
         TreeMap<Integer, RawCurriculum> lessonIdToCurriculum = new TreeMap<>();
         for (RawCurriculum rawCurriculum : scheduleOfTeacher.getCurricula()) {
             lessonIdToCurriculum.put(rawCurriculum.getLessonId(), rawCurriculum);
@@ -29,9 +30,9 @@ public class TeacherSchedule {
             }
             groupsWithSameUberId.add(group);
         }
-        lessons = new ArrayList<>(7);
+        days = new ArrayList<>(7);
         for (int i = 0; i < 7; ++i) {
-            lessons.add(new TreeSet<TeacherLesson>());
+            days.add(new ArrayList<LessonForTeacher>());
         }
         for (RawLesson lesson : scheduleOfTeacher.getLessons()) {
             LessonTime lessonTime = new LessonTime(lesson.getTimeSlot());
@@ -46,11 +47,17 @@ public class TeacherSchedule {
             }
             String room = curriculum.getRoomName().isEmpty() ? "" : "ауд.: " + curriculum.getRoomName();
             int dayOfWeek = lessonTime.getDayOfWeek();
-            lessons.get(dayOfWeek).add(new TeacherLesson(period, weekType, subjectName, groups, room));
+            days.get(dayOfWeek).add(new LessonForTeacher(period, weekType, subjectName, groups, room));
+        }
+        for (ArrayList<LessonForTeacher> lessons : days) {
+            Collections.sort(lessons, new Comparator<LessonForTeacher>() {
+                @Override
+                public int compare(LessonForTeacher lhs, LessonForTeacher rhs) {
+                    return lhs.getPeriod().getBegin().getHour() - rhs.getPeriod().getBegin().getHour();
+                }
+            });
         }
     }
 
-    public ArrayList<TreeSet<TeacherLesson>> getLessons() {
-        return lessons;
-    }
+    public ArrayList<ArrayList<LessonForTeacher>> getDays() { return days; }
 }

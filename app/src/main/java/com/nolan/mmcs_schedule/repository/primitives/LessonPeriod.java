@@ -9,14 +9,6 @@ public class LessonPeriod {
         this.end = end;
     }
 
-    @Override
-    public boolean equals(Object obj) {
-        if (!(obj instanceof LessonPeriod)) return false;
-        LessonPeriod another = (LessonPeriod) obj;
-        return begin.equals(another.begin) &&
-                end.equals(another.end);
-    }
-
     public HourMinute getBegin() {
         return begin;
     }
