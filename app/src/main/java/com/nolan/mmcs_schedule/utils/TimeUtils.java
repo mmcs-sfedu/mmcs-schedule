@@ -3,6 +3,7 @@ package com.nolan.mmcs_schedule.utils;
 public class TimeUtils {
     private static String[] DAYS_OF_WEEK = {
             "Понедельник",
+            "Вторник",
             "Среда",
             "Четверг",
             "Пятница",
