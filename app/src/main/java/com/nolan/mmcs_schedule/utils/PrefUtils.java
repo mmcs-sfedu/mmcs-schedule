@@ -9,7 +9,7 @@ import com.nolan.mmcs_schedule.ui.schedule_activity.WeekTypeOption;
 /**
  * Class that presents access to shared preferences.
  */
-public class UtilsPreferences {
+public class PrefUtils {
     private static SharedPreferences getPreferences() {
         return ScheduleApplication.get().getSharedPreferences("preferences", Context.MODE_PRIVATE);
     }

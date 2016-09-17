@@ -1,16 +1,17 @@
 package com.nolan.mmcs_schedule.ui.schedule_activity;
 
-import android.util.Pair;
-
 import com.nolan.mmcs_schedule.repository.ScheduleRepository;
+import com.nolan.mmcs_schedule.repository.primitives.GroupAtLesson;
 import com.nolan.mmcs_schedule.repository.primitives.LessonForGroup;
-import com.nolan.mmcs_schedule.repository.primitives.ScheduleOfGroup;
 import com.nolan.mmcs_schedule.repository.primitives.LessonForTeacher;
+import com.nolan.mmcs_schedule.repository.primitives.RoomForLesson;
+import com.nolan.mmcs_schedule.repository.primitives.ScheduleOfGroup;
 import com.nolan.mmcs_schedule.repository.primitives.ScheduleOfTeacher;
 import com.nolan.mmcs_schedule.repository.primitives.WeekType;
-import com.nolan.mmcs_schedule.ui.schedule_activity.lesson_dialog.LessonDetails;
-import com.nolan.mmcs_schedule.utils.PairSerializable;
-import com.nolan.mmcs_schedule.utils.UtilsPreferences;
+import com.nolan.mmcs_schedule.ui.schedule_activity.lesson_dialog.LessonForGroupDetails;
+import com.nolan.mmcs_schedule.ui.schedule_activity.lesson_dialog.LessonForTeacherDetails;
+import com.nolan.mmcs_schedule.utils.PrefUtils;
+import com.nolan.mmcs_schedule.utils.TimeUtils;
 import com.octo.android.robospice.persistence.exception.SpiceException;
 import com.octo.android.robospice.request.listener.RequestListener;
 
@@ -20,18 +21,66 @@ import java.util.TreeMap;
 
 public class SchedulePresenter implements ScheduleAdapter.OnLessonClickListener {
     public interface View {
+        void setTitle(String title);
         void setSubtitle(String subtitle);
         void setSchedule(ArrayList<DaySchedule> schedule);
-        void showLessonDetails(LessonDetails details);
+        void showLoading();
+        void showSchedule();
+        void showLessonDetails(int dayIndex, int lessonIndex, LessonForTeacherDetails details);
+        void showLessonDetails(int dayIndex, int lessonIndex, LessonForGroupDetails details);
         void startReportErrorActivity(String subject, String text);
         void startPickScheduleActivity();
+        void startScheduleActivity(boolean isScheduleOfGroup, int id, String title);
         void onError(String message);
+    }
+
+    private interface WeekTypeOptionHolder {
+        void set(WeekTypeOption weekTypeOption);
+        WeekTypeOption get();
+    }
+
+    private static class SavingWeekTypeOptionHolder implements WeekTypeOptionHolder {
+        private PrefUtils preferences;
+
+        public SavingWeekTypeOptionHolder(PrefUtils preferences) {
+            this.preferences = preferences;
+        }
+
+        @Override
+        public WeekTypeOption get() {
+            return preferences.getWeekTypeOption();
+        }
+
+        @Override
+        public void set(WeekTypeOption weekTypeOption) {
+            preferences.setWeekTypeOption(weekTypeOption);
+        }
+    }
+
+    private static class NonSavingWeekTypeOptionHolder implements WeekTypeOptionHolder {
+        private WeekTypeOption weekTypeOption;
+
+        public NonSavingWeekTypeOptionHolder(WeekTypeOption startValue) {
+            this.weekTypeOption = startValue;
+        }
+
+        @Override
+        public void set(WeekTypeOption weekTypeOption) {
+            this.weekTypeOption = weekTypeOption;
+        }
+
+        @Override
+        public WeekTypeOption get() {
+            return weekTypeOption;
+        }
     }
 
     private View view;
 
     private ScheduleRepository repository;
-    private UtilsPreferences preferences;
+    private PrefUtils preferences;
+
+    private WeekTypeOptionHolder weekTypeOptionHolder;
 
     private WeekType weekType;
 
@@ -56,13 +105,28 @@ public class SchedulePresenter implements ScheduleAdapter.OnLessonClickListener 
     private boolean loadedCurrentWeek = false;
     private boolean loadedSchedule = false;
 
-    public SchedulePresenter(View view, ScheduleRepository repository, UtilsPreferences preferences) {
+    private boolean isShowingScheduleOfGroup;
+    private int id;
+    private String title;
+
+    public SchedulePresenter(View view, boolean isSavingWeekTypeOption, boolean isShowingScheduleOfGroup,
+                             int id, String title, ScheduleRepository repository,
+                             PrefUtils preferences) {
         this.view = view;
+        this.isShowingScheduleOfGroup = isShowingScheduleOfGroup;
+        this.id = id;
+        this.title = title;
         this.repository = repository;
         this.preferences = preferences;
+        this.weekTypeOptionHolder =
+                isSavingWeekTypeOption
+                        ? new SavingWeekTypeOptionHolder(preferences)
+                        : new NonSavingWeekTypeOptionHolder(WeekTypeOption.FULL);
     }
 
     public void start() {
+        view.setTitle(title);
+
         repository.getCurrentWeekType(new RequestListener<WeekType>() {
             @Override
             public void onRequestFailure(SpiceException spiceException) {
@@ -72,7 +136,7 @@ public class SchedulePresenter implements ScheduleAdapter.OnLessonClickListener 
 
             @Override
             public void onRequestSuccess(WeekType wt) {
-                WeekTypeOption weekTypeOption = preferences.getWeekTypeOption();
+                WeekTypeOption weekTypeOption = weekTypeOptionHolder.get();
                 currentWeek = wt;
                 weekType = getWeekType(weekTypeOption);
                 view.setSubtitle(getSubtitle(weekTypeOption));
@@ -81,8 +145,8 @@ public class SchedulePresenter implements ScheduleAdapter.OnLessonClickListener 
             }
         });
 
-        if (preferences.getPickedScheduleOfGroup()) {
-            repository.getScheduleOfGroup(preferences.getGroupId(), new RequestListener<ScheduleOfGroup>() {
+        if (isShowingScheduleOfGroup) {
+            repository.getScheduleOfGroup(id, new RequestListener<ScheduleOfGroup>() {
                 @Override
                 public void onRequestFailure(SpiceException spiceException) {
                     preferences.setScheduleWasPicked(false);
@@ -97,7 +161,7 @@ public class SchedulePresenter implements ScheduleAdapter.OnLessonClickListener 
                 }
             });
         } else {
-            repository.getScheduleOfTeacher(preferences.getTeacherId(), new RequestListener<ScheduleOfTeacher>() {
+            repository.getScheduleOfTeacher(id, new RequestListener<ScheduleOfTeacher>() {
                 @Override
                 public void onRequestFailure(SpiceException spiceException) {
                     preferences.setScheduleWasPicked(false);
@@ -114,15 +178,9 @@ public class SchedulePresenter implements ScheduleAdapter.OnLessonClickListener 
         }
     }
 
-    private static final String[] DAYS_OF_WEEK = new String[] {
-            "Понедельник", "Вторник", "Среда", "Четверг",
-            "Пятница", "Суббота", "Воскресенье"
-    };
-
     private void showScheduleIfLoadingDone() {
         if (!loadedCurrentWeek || !loadedSchedule) return;
-        view.setSchedule(preferences.getPickedScheduleOfGroup()
-                         ? getWeekForGroup() : getWeekForTeacher());
+        view.setSchedule(isShowingScheduleOfGroup ? getWeekForGroup() : getWeekForTeacher());
     }
 
     private ArrayList<DaySchedule> getWeekForGroup() {
@@ -145,7 +203,7 @@ public class SchedulePresenter implements ScheduleAdapter.OnLessonClickListener 
                 lessons.add(textual);
             }
             if (!lessons.isEmpty()) {
-                schedule.add(new DaySchedule(DAYS_OF_WEEK[i], lessons));
+                schedule.add(new DaySchedule(TimeUtils.getDisplayDayOfWeek(i), lessons));
             }
         }
         return schedule;
@@ -167,11 +225,11 @@ public class SchedulePresenter implements ScheduleAdapter.OnLessonClickListener 
                         lesson.getPeriod().getEnd().toString(),
                         lesson.getSubjectName(),
                         weekType == WeekType.FULL ? weekTypeToString(lesson.getWeekType()) : "");
+                dayNumAndLessonNumToLesson.put(getKey(schedule.size(), lessons.size()), lesson);
                 lessons.add(textual);
-                dayNumAndLessonNumToLesson.put(getKey(schedule.size() - 1, lessons.size() - 1), lesson);
             }
             if (!lessons.isEmpty()) {
-                schedule.add(new DaySchedule(DAYS_OF_WEEK[i], lessons));
+                schedule.add(new DaySchedule(TimeUtils.getDisplayDayOfWeek(i), lessons));
             }
         }
         return schedule;
@@ -193,7 +251,7 @@ public class SchedulePresenter implements ScheduleAdapter.OnLessonClickListener 
     }
 
     public void onWeekTypeOptionChanged(WeekTypeOption weekTypeOption) {
-        preferences.setWeekTypeOption(weekTypeOption);
+        weekTypeOptionHolder.set(weekTypeOption);
         weekType = getWeekType(weekTypeOption);
         view.setSubtitle(getSubtitle(weekTypeOption));
         // TODO: Agrhhh
@@ -237,36 +295,44 @@ public class SchedulePresenter implements ScheduleAdapter.OnLessonClickListener 
     @Override
     public void onLessonClick(int dayIndex, int lessonIndex) {
         Object lesson = dayNumAndLessonNumToLesson.get(getKey(dayIndex, lessonIndex));
-        if (preferences.getPickedScheduleOfGroup()) {
-            LessonForGroup lessonForGroup = (LessonForGroup) lesson;
-            ArrayList<PairSerializable<String, String>> roomsAndTeachers
-                    = new ArrayList<>(lessonForGroup.getRoomsAndTeachers().size());
-            for (Pair<String, String> roomAndTeacher : lessonForGroup.getRoomsAndTeachers()) {
-                roomsAndTeachers.add(
-                        new PairSerializable<>(roomAndTeacher.first, roomAndTeacher.second));
-            }
-            view.showLessonDetails(new LessonDetails(
-                    lessonForGroup.getPeriod().getBegin().toString(),
-                    lessonForGroup.getPeriod().getEnd().toString(),
-                    lessonForGroup.getSubjectName(),
-                    roomsAndTeachers));
+        if (isShowingScheduleOfGroup) {
+            view.showLessonDetails(
+                    dayIndex, lessonIndex, new LessonForGroupDetails((LessonForGroup) lesson));
         } else {
-            LessonForTeacher lessonForTeacher = (LessonForTeacher) lesson;
-            ArrayList<PairSerializable<String, String>> roomAndGroups = new ArrayList<>();
-            if (lessonForTeacher.getGroups().isEmpty()) {
-                roomAndGroups.add(new PairSerializable<>(lessonForTeacher.getRoom(), ""));
-            } else {
-                roomAndGroups.add(new PairSerializable<>(lessonForTeacher.getRoom(),
-                        lessonForTeacher.getGroups().get(0)));
-                for (int i = 1; i < lessonForTeacher.getGroups().size(); ++i) {
-                    roomAndGroups.add(new PairSerializable<>("", lessonForTeacher.getGroups().get(1)));
-                }
-            }
-            view.showLessonDetails(new LessonDetails(
-                    lessonForTeacher.getPeriod().getBegin().toString(),
-                    lessonForTeacher.getPeriod().getEnd().toString(),
-                    lessonForTeacher.getSubjectName(),
-                    roomAndGroups));
+            view.showLessonDetails(
+                    dayIndex, lessonIndex, new LessonForTeacherDetails((LessonForTeacher) lesson));
         }
+    }
+
+    public void onShowSchedule(int dayIndex, int lessonIndex, int teacherOfGroupIndex) {
+        if (isShowingScheduleOfGroup) {
+            LessonForGroup lesson =
+                    (LessonForGroup) dayNumAndLessonNumToLesson.get(getKey(dayIndex, lessonIndex));
+            RoomForLesson room = lesson.getRooms().get(teacherOfGroupIndex);
+            view.startScheduleActivity(false, room.getTeacherId(), room.getTeacherName());
+        } else {
+            LessonForTeacher lesson =
+                    (LessonForTeacher) dayNumAndLessonNumToLesson.get(getKey(dayIndex, lessonIndex));
+            final GroupAtLesson groupAtLesson = lesson.getGroups().get(teacherOfGroupIndex);
+            view.showLoading();
+            repository.getGroupId(groupAtLesson.getGradeNum(), groupAtLesson.getGroupNum(),
+                    new RequestListener<Integer>() {
+                        @Override
+                        public void onRequestFailure(SpiceException spiceException) {
+                            view.onError("Ошибка при загрузе расписания группы");
+                            view.showSchedule();
+                        }
+
+                        @Override
+                        public void onRequestSuccess(Integer integer) {
+                            view.showSchedule();
+                            view.startScheduleActivity(true, integer, groupAtLesson.getName());
+                        }
+                    });
+        }
+    }
+
+    public boolean isChangeScheduleButtonVisible() {
+        return isShowingScheduleOfGroup;
     }
 }

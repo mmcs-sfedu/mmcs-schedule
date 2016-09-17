@@ -10,8 +10,11 @@ import com.nolan.mmcs_schedule.repository.primitives.ScheduleOfGroup;
 import com.nolan.mmcs_schedule.repository.primitives.ScheduleOfTeacher;
 import com.nolan.mmcs_schedule.repository.primitives.Teacher;
 import com.nolan.mmcs_schedule.repository.primitives.WeekType;
+import com.nolan.mmcs_schedule.ui.schedule_activity.ScheduleActivity;
 import com.octo.android.robospice.SpiceManager;
 import com.octo.android.robospice.persistence.DurationInMillis;
+import com.octo.android.robospice.persistence.exception.SpiceException;
+import com.octo.android.robospice.request.SpiceRequest;
 import com.octo.android.robospice.request.listener.RequestListener;
 import com.octo.android.robospice.request.retrofit.RetrofitSpiceRequest;
 
@@ -148,7 +151,6 @@ public class ScheduleRepository {
     }
 
     public void getCurrentWeekType(RequestListener<WeekType> listener) {
-
         // http://stackoverflow.com/a/11989680/4626533 © Denys Séguret
         Calendar c = Calendar.getInstance();
         c.add(Calendar.DAY_OF_MONTH, 1);
@@ -157,8 +159,39 @@ public class ScheduleRepository {
         c.set(Calendar.SECOND, 0);
         c.set(Calendar.MILLISECOND, 0);
         long untilMidnight = (c.getTimeInMillis() - System.currentTimeMillis());
-
         spiceManager.execute(new WeekTypeRequest(), "getCurrentWeekType()", untilMidnight, listener);
+    }
+
+    public void getGroupId(final int gradeNum, final int groupNum, final RequestListener<Integer> listener) {
+        getGrades(new RequestListener<Grade.List>() {
+            @Override
+            public void onRequestFailure(SpiceException spiceException) {
+                listener.onRequestFailure(spiceException);
+            }
+
+            @Override
+            public void onRequestSuccess(Grade.List grades) {
+                for (Grade grade : grades) {
+                    if (grade.getNum() != gradeNum) continue;
+                    getGroups(grade.getId(), gradeNum, new RequestListener<Group.List>() {
+                        @Override
+                        public void onRequestFailure(SpiceException spiceException) {
+                            listener.onRequestFailure(spiceException);
+                        }
+
+                        @Override
+                        public void onRequestSuccess(Group.List groups) {
+                            for (Group group : groups) {
+                                if (group.getNum() != groupNum) continue;
+                                listener.onRequestSuccess(group.getId());
+                                break;
+                            }
+                        }
+                    });
+                    break;
+                }
+            }
+        });
     }
 }
 

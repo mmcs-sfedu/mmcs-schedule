@@ -67,13 +67,13 @@ public class ScheduleAdapter extends BaseAdapter {
         }
 
         public LessonViewHolder acquire() {
-            if (!freeViews.isEmpty()) {
-                int lastItem = freeViews.size() - 1;
-                LessonViewHolder lastViewHolder = freeViews.get(lastItem);
-                freeViews.remove(lastItem);
-                return lastViewHolder;
+            if (freeViews.isEmpty()) {
+                return inflateLessonViewHolder();
             }
-            return inflateLessonViewHolder();
+            int lastItem = freeViews.size() - 1;
+            LessonViewHolder lastViewHolder = freeViews.get(lastItem);
+            freeViews.remove(lastItem);
+            return lastViewHolder;
         }
 
         public void put(LessonViewHolder lessonViewHolder) {

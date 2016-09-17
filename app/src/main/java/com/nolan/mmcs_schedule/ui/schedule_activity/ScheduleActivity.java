@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.v4.app.DialogFragment;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -16,14 +17,21 @@ import com.nolan.mmcs_schedule.Injector;
 import com.nolan.mmcs_schedule.R;
 import com.nolan.mmcs_schedule.repository.ScheduleRepository;
 import com.nolan.mmcs_schedule.ui.BaseActivity;
-import com.nolan.mmcs_schedule.ui.schedule_activity.lesson_dialog.LessonDetails;
-import com.nolan.mmcs_schedule.ui.schedule_activity.lesson_dialog.LessonDetailsDialog;
 import com.nolan.mmcs_schedule.ui.pick_schedule_activity.PickScheduleActivity;
-import com.nolan.mmcs_schedule.utils.UtilsPreferences;
+import com.nolan.mmcs_schedule.ui.schedule_activity.lesson_dialog.LessonDetailsDialog;
+import com.nolan.mmcs_schedule.ui.schedule_activity.lesson_dialog.LessonForGroupDetails;
+import com.nolan.mmcs_schedule.ui.schedule_activity.lesson_dialog.LessonForTeacherDetails;
+import com.nolan.mmcs_schedule.utils.PrefUtils;
 
 import java.util.ArrayList;
 
-public class ScheduleActivity extends BaseActivity implements SchedulePresenter.View {
+public class ScheduleActivity extends BaseActivity
+        implements SchedulePresenter.View, LessonDetailsDialog.Activity {
+    private static final String KEY_IS_SAVING_WEEK_TYPE_OPTION = "key_persistent";
+    private static final String KEY_IS_SHOWING_SCHEDULE_OF_GROUP = "key_schedule_of_group";
+    private static final String KEY_ID = "key_id";
+    private static final String KEY_TITLE = "key_title";
+
     private ProgressBar pbLoading;
     private ListView lvSchedule;
 
@@ -31,8 +39,17 @@ public class ScheduleActivity extends BaseActivity implements SchedulePresenter.
 
     private SchedulePresenter presenter;
 
-    public static void start(Context context) {
-        context.startActivity(new Intent(context, ScheduleActivity.class));
+    private DialogFragment detailsDialog;
+
+    public static void start(Context context, boolean isSavingWeekTypeOption,
+                             boolean scheduleOfGroup, int id, String title) {
+        Intent intent = new Intent(context, ScheduleActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_MULTIPLE_TASK);
+        intent.putExtra(KEY_IS_SAVING_WEEK_TYPE_OPTION, isSavingWeekTypeOption);
+        intent.putExtra(KEY_IS_SHOWING_SCHEDULE_OF_GROUP, scheduleOfGroup);
+        intent.putExtra(KEY_ID, id);
+        intent.putExtra(KEY_TITLE, title);
+        context.startActivity(intent);
     }
 
     @Override
@@ -40,18 +57,30 @@ public class ScheduleActivity extends BaseActivity implements SchedulePresenter.
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_schedule);
 
+        Intent intent = getIntent();
+
+        boolean isSavingWeekTypeOption = intent.getBooleanExtra(KEY_IS_SAVING_WEEK_TYPE_OPTION, false);
+        boolean isShowingScheduleOfGroup = intent.getBooleanExtra(KEY_IS_SHOWING_SCHEDULE_OF_GROUP, false);
+        int id = intent.getIntExtra(KEY_ID, -1);
+        String title = intent.getStringExtra(KEY_TITLE);
+
         pbLoading = (ProgressBar) findViewById(R.id.pb_loading);
         lvSchedule = (ListView) findViewById(R.id.lv_schedule);
 
-        UtilsPreferences preferences = Injector.injectPreferences();
+        PrefUtils preferences = Injector.injectPreferences();
         ScheduleRepository repository = Injector.injectRepository(this);
 
-        presenter = new SchedulePresenter(this, repository, preferences);
+        presenter = new SchedulePresenter(
+                this, isSavingWeekTypeOption, isShowingScheduleOfGroup, id,
+                title, repository, preferences);
 
         adapter = new ScheduleAdapter(presenter);
         lvSchedule.setAdapter(adapter);
+    }
 
-        setTitle(preferences.getTitle());
+    @Override
+    public void setTitle(String title) {
+        getSupportActionBar().setTitle(title);
     }
 
     @Override
@@ -66,8 +95,15 @@ public class ScheduleActivity extends BaseActivity implements SchedulePresenter.
     }
 
     @Override
-    public void showLessonDetails(LessonDetails details) {
-        LessonDetailsDialog.create(details).show(getSupportFragmentManager(), "lesson-details");
+    public void showLessonDetails(int dayIndex, int lessonIndex, LessonForGroupDetails details) {
+        detailsDialog = LessonDetailsDialog.create(dayIndex, lessonIndex, details);
+        detailsDialog.show(getSupportFragmentManager(), "lesson-details");
+    }
+
+    @Override
+    public void showLessonDetails(int dayIndex, int lessonIndex, LessonForTeacherDetails details) {
+        detailsDialog = LessonDetailsDialog.create(dayIndex, lessonIndex, details);
+        detailsDialog.show(getSupportFragmentManager(), "lesson-details");
     }
 
     @Override
@@ -80,13 +116,18 @@ public class ScheduleActivity extends BaseActivity implements SchedulePresenter.
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.main_menu, menu);
+        MenuItem miChangeSchedule = menu.findItem(R.id.mi_change_schedule);
+        if (!presenter.isChangeScheduleButtonVisible()) {
+            miChangeSchedule.setVisible(false);
+            miChangeSchedule.setEnabled(false);
+        }
         return true;
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
-            case R.id.mi_another_schedule:
+            case R.id.mi_change_schedule:
                 presenter.onPickAnotherSchedule();
                 break;
             case R.id.mi_show_current:
@@ -112,12 +153,14 @@ public class ScheduleActivity extends BaseActivity implements SchedulePresenter.
         return true;
     }
 
-    private void showLoading() {
+    @Override
+    public void showLoading() {
         pbLoading.setVisibility(View.VISIBLE);
         lvSchedule.setVisibility(View.GONE);
     }
 
-    private void showSchedule() {
+    @Override
+    public void showSchedule() {
         pbLoading.setVisibility(View.GONE);
         lvSchedule.setVisibility(View.VISIBLE);
     }
@@ -140,6 +183,16 @@ public class ScheduleActivity extends BaseActivity implements SchedulePresenter.
     @Override
     public void onError(String message) {
         Toast.makeText(ScheduleActivity.this, message, Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void onShowSchedule(int dayIndex, int lessonIndex, int teacherOfGroupIndex) {
+        presenter.onShowSchedule(dayIndex, lessonIndex, teacherOfGroupIndex);
+    }
+
+    @Override
+    public void startScheduleActivity(boolean isScheduleOfGroup, int id, String title) {
+        ScheduleActivity.start(this, false, isScheduleOfGroup, id, title);
     }
 }
 

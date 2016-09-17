@@ -9,7 +9,7 @@ android {
         minSdkVersion 15
         targetSdkVersion 24
         versionCode 12
-        versionName "1.4.8"
+        versionName "1.5.0"
     }
     buildTypes {
         debug {

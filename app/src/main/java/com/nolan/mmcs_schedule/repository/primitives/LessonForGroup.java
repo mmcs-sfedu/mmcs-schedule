@@ -1,21 +1,21 @@
 package com.nolan.mmcs_schedule.repository.primitives;
 
-import android.util.Pair;
-
 import java.util.ArrayList;
 
 public class LessonForGroup {
     private LessonPeriod period;
     private WeekType weekType;
     private String subjectName;
-    private ArrayList<Pair<String, String>> roomsAndTeachers;
+    private ArrayList<RoomForLesson> rooms;
+    private int dayOfWeek; // 0-based
 
     public LessonForGroup(LessonPeriod period, WeekType weekType, String subjectName,
-                          ArrayList<Pair<String, String>> roomsAndTeachers) {
+                          ArrayList<RoomForLesson> rooms, int dayOfWeek) {
         this.period = period;
         this.weekType = weekType;
         this.subjectName = subjectName;
-        this.roomsAndTeachers = roomsAndTeachers;
+        this.rooms = rooms;
+        this.dayOfWeek = dayOfWeek;
     }
 
     public LessonPeriod getPeriod() {
@@ -30,8 +30,12 @@ public class LessonForGroup {
         return subjectName;
     }
 
-    public ArrayList<Pair<String, String>> getRoomsAndTeachers() {
-        return roomsAndTeachers;
+    public ArrayList<RoomForLesson> getRooms() {
+        return rooms;
+    }
+
+    public int getDayOfWeek() {
+        return dayOfWeek;
     }
 }
 

@@ -4,7 +4,7 @@ import com.nolan.mmcs_schedule.repository.ScheduleRepository;
 import com.nolan.mmcs_schedule.repository.primitives.Grade;
 import com.nolan.mmcs_schedule.repository.primitives.Group;
 import com.nolan.mmcs_schedule.repository.primitives.Teacher;
-import com.nolan.mmcs_schedule.utils.UtilsPreferences;
+import com.nolan.mmcs_schedule.utils.PrefUtils;
 import com.octo.android.robospice.persistence.exception.SpiceException;
 import com.octo.android.robospice.request.listener.RequestListener;
 
@@ -12,16 +12,16 @@ import java.util.List;
 
 public class PickSchedulePresenter {
     public interface View {
-        void startScheduleActivity();
         void setTeachers(List teachers);
         void setGroups(List groups);
         void setGrades(List grades);
         void showError(String text);
+        void startScheduleActivity(boolean scheduleOfGroup, int id, String title);
     }
 
     private View view;
     private ScheduleRepository repository;
-    private UtilsPreferences preferences;
+    private PrefUtils preferences;
 
     private Teacher.List teachers = null;
     private Grade.List grades = null;
@@ -34,7 +34,7 @@ public class PickSchedulePresenter {
     private boolean groupWasPicked;
 
     public PickSchedulePresenter(View view, ScheduleRepository repository,
-                                 UtilsPreferences preferences) {
+                                 PrefUtils preferences) {
         this.view = view;
         this.repository = repository;
         this.preferences = preferences;
@@ -126,6 +126,9 @@ public class PickSchedulePresenter {
             preferences.setTeacherId(pickedTeacher.getId());
             preferences.setTitle(pickedTeacher.getName());
         }
-        view.startScheduleActivity();
+        view.startScheduleActivity(
+                groupWasPicked,
+                groupWasPicked ? pickedGroup.getId() : pickedTeacher.getId(),
+                preferences.getTitle());
     }
 }

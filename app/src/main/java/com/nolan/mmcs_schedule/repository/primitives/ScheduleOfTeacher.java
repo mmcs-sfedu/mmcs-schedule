@@ -6,7 +6,6 @@ import com.nolan.mmcs_schedule.repository.api.primitives.RawLesson;
 import com.nolan.mmcs_schedule.repository.api.primitives.RawScheduleOfTeacher;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.TreeMap;
@@ -41,13 +40,16 @@ public class ScheduleOfTeacher {
             LessonPeriod period = lessonTime.getPeriod();
             WeekType weekType = lessonTime.getWeekType();
             String subjectName = curriculum.getSubjectName();
-            ArrayList<String> groups = new ArrayList<>(uberIdToGroups.get(uberId).size());
+            ArrayList<GroupAtLesson> groups = new ArrayList<>(uberIdToGroups.get(uberId).size());
             for (RawGroupAtLesson groupAtLesson : uberIdToGroups.get(uberId)) {
-                groups.add(groupAtLesson.toString());
+                String name = groupAtLesson.toString();
+                int gradeNum = groupAtLesson.getGradeNum();
+                int groupNum = groupAtLesson.getGroupNum();
+                groups.add(new GroupAtLesson(name, gradeNum, groupNum));
             }
-            String room = curriculum.getRoomName().isEmpty() ? "" : "ауд.: " + curriculum.getRoomName();
+            String room = curriculum.getRoomName().isEmpty() ? "" : "а." + curriculum.getRoomName();
             int dayOfWeek = lessonTime.getDayOfWeek();
-            days.get(dayOfWeek).add(new LessonForTeacher(period, weekType, subjectName, groups, room));
+            days.get(dayOfWeek).add(new LessonForTeacher(period, weekType, subjectName, dayOfWeek, groups, room));
         }
         for (ArrayList<LessonForTeacher> lessons : days) {
             Collections.sort(lessons, new Comparator<LessonForTeacher>() {

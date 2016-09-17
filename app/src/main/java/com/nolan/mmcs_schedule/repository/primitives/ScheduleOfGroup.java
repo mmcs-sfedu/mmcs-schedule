@@ -1,6 +1,6 @@
 package com.nolan.mmcs_schedule.repository.primitives;
 
-import android.util.Pair;
+import android.util.Log;
 
 import com.nolan.mmcs_schedule.repository.api.primitives.RawCurriculum;
 import com.nolan.mmcs_schedule.repository.api.primitives.RawLesson;
@@ -36,14 +36,17 @@ public class ScheduleOfGroup {
             LessonPeriod period = lessonTime.getPeriod();
             WeekType weekType = lessonTime.getWeekType();
             String subjectName = curricula.get(0).getSubjectName();
-            ArrayList<Pair<String, String>> roomsAndTeachers = new ArrayList<>();
+            ArrayList<RoomForLesson> roomsAndTeachers = new ArrayList<>();
             for (RawCurriculum curriculum : curricula) {
-                roomsAndTeachers.add(
-                        new Pair<>(curriculum.getRoomName(), curriculum.getTeacherName()));
+                roomsAndTeachers.add(new RoomForLesson(
+                        curriculum.getTeacherId(),
+                        curriculum.getTeacherName(),
+                        curriculum.getRoomName()));
             }
             int dayOfWeek = lessonTime.getDayOfWeek();
+            Log.i("42", String.valueOf(dayOfWeek));
             days.get(dayOfWeek).add(new LessonForGroup(
-                    period, weekType, subjectName, roomsAndTeachers));
+                    period, weekType, subjectName, roomsAndTeachers, dayOfWeek));
         }
         for (ArrayList<LessonForGroup> lessons : days) {
             Collections.sort(lessons, new Comparator<LessonForGroup>() {

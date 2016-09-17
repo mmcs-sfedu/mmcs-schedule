@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <item
-        android:id="@+id/mi_another_schedule"
+        android:id="@+id/mi_change_schedule"
         android:icon="@drawable/ic_exit_to_app_white_24dp"
         android:title="Другое расписание"
         app:showAsAction="ifRoom" />

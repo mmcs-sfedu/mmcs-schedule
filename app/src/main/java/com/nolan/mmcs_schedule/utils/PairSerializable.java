@@ -1,6 +1,8 @@
 package com.nolan.mmcs_schedule.utils;
 
-public class PairSerializable<F, S> {
+import java.io.Serializable;
+
+public class PairSerializable<F extends Serializable, S extends Serializable> {
     public final F first;
     public final S second;
 

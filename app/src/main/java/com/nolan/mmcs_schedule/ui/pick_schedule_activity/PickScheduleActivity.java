@@ -14,13 +14,13 @@ import com.nolan.mmcs_schedule.R;
 import com.nolan.mmcs_schedule.repository.ScheduleRepository;
 import com.nolan.mmcs_schedule.ui.BaseActivity;
 import com.nolan.mmcs_schedule.ui.schedule_activity.ScheduleActivity;
-import com.nolan.mmcs_schedule.utils.UtilsPreferences;
+import com.nolan.mmcs_schedule.utils.PrefUtils;
 
 import java.util.List;
 
 public class PickScheduleActivity extends BaseActivity implements PickSchedulePresenter.View, GroupFragment.Activity, TeacherFragment.Activity {
     private PickSchedulePresenter presenter;
-    private UtilsPreferences preferences;
+    private PrefUtils preferences;
 
     private RadioGroup rgScheduleType;
     private GroupFragment groupFragment;
@@ -122,8 +122,8 @@ public class PickScheduleActivity extends BaseActivity implements PickSchedulePr
     }
 
     @Override
-    public void startScheduleActivity() {
-        ScheduleActivity.start(this);
+    public void startScheduleActivity(boolean scheduleOfGroup, int id, String title) {
+        ScheduleActivity.start(this, true, scheduleOfGroup, id, title);
         finish();
     }
 
