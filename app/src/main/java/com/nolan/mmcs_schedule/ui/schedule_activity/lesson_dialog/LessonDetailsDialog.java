@@ -9,6 +9,7 @@ import android.support.v7.app.AlertDialog;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -125,11 +126,12 @@ public class LessonDetailsDialog extends DialogFragment {
             room.setText(teacherDetails.getRoom());
             int pos = 0;
             for (String group : teacherDetails.getGroups()) {
-                TextView tvGroup = (TextView) inflater.inflate(R.layout.details_group_list_item, null, false);
-                llTeacherList.addView(tvGroup);
-                tvGroup.setTag(pos++);
+                View view = inflater.inflate(R.layout.details_group_list_item, null, false);
+                llTeacherList.addView(view);
+                view.setTag(pos++);
+                view.setOnClickListener(onItemClickListener);
+                TextView tvGroup = (TextView) view.findViewById(R.id.tv_group);
                 tvGroup.setText(group);
-                tvGroup.setOnClickListener(onItemClickListener);
             }
         }
         return new AlertDialog.Builder(getActivity())
