@@ -99,16 +99,11 @@ public class PrefUtils {
                 .apply();
     }
 
-    private static final String KEY_REPORT_ERROR_URI = "report-error-uri";
-    public String getReportErrorUri() {
-        return getPreferences().getString(KEY_REPORT_ERROR_URI, null);
+    private static final String KEY_CACHE_VERSION = "cache-version";
+    public int getCacheVersion() {
+        return getPreferences().getInt(KEY_CACHE_VERSION, -1);
     }
-    public void setReportErrorUri(String uri) {
-        getPreferences()
-                .edit()
-                .putString(KEY_REPORT_ERROR_URI, uri)
-                .apply();
+    public void setCacheVersion(int version) {
+        getPreferences().edit().putInt(KEY_CACHE_VERSION, version).apply();
     }
-
-
 }
