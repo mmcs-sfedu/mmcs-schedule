@@ -44,7 +44,6 @@ public class ScheduleActivity extends BaseActivity
     public static void start(Context context, boolean isSavingWeekTypeOption,
                              boolean scheduleOfGroup, int id, String title) {
         Intent intent = new Intent(context, ScheduleActivity.class);
-        intent.addFlags(Intent.FLAG_ACTIVITY_MULTIPLE_TASK);
         intent.putExtra(KEY_IS_SAVING_WEEK_TYPE_OPTION, isSavingWeekTypeOption);
         intent.putExtra(KEY_IS_SHOWING_SCHEDULE_OF_GROUP, scheduleOfGroup);
         intent.putExtra(KEY_ID, id);
