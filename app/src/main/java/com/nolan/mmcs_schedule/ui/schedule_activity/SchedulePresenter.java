@@ -105,6 +105,7 @@ public class SchedulePresenter implements ScheduleAdapter.OnLessonClickListener 
     private boolean loadedCurrentWeek = false;
     private boolean loadedSchedule = false;
 
+    private boolean isSavingWeekTypeOption;
     private boolean isShowingScheduleOfGroup;
     private int id;
     private String title;
@@ -118,6 +119,7 @@ public class SchedulePresenter implements ScheduleAdapter.OnLessonClickListener 
         this.title = title;
         this.repository = repository;
         this.preferences = preferences;
+        this.isSavingWeekTypeOption = isSavingWeekTypeOption;
         this.weekTypeOptionHolder =
                 isSavingWeekTypeOption
                         ? new SavingWeekTypeOptionHolder(preferences)
@@ -333,6 +335,6 @@ public class SchedulePresenter implements ScheduleAdapter.OnLessonClickListener 
     }
 
     public boolean isChangeScheduleButtonVisible() {
-        return isShowingScheduleOfGroup;
+        return isSavingWeekTypeOption;
     }
 }
