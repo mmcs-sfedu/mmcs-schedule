@@ -16,5 +16,3 @@
 #   public *;
 #}
 
--dontwarn retrofit.*
--dontwarn com.octo.android.robospice.*

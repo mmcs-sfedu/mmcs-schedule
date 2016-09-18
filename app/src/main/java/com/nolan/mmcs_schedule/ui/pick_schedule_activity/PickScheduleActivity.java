@@ -34,7 +34,6 @@ public class PickScheduleActivity extends BaseActivity implements PickSchedulePr
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         setContentView(R.layout.activity_pick_schedule);
 
         ScheduleRepository repository = Injector.injectRepository(this);
