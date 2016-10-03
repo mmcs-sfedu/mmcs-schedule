@@ -20,36 +20,36 @@ import retrofit.http.Path;
  */
 public interface ScheduleApi {
 
-    @GET("/grade/list")
+    @GET("/APIv0/grade/list")
     RawGrade.List getGrades();
 
-    @GET("/group/list/{gradeID}")
+    @GET("/APIv0/group/list/{gradeID}")
     RawGroup.List getGroups(@Path("gradeID") int gradeId);
 
-    @GET("/group/forUber/{uberID}")
+    @GET("/APIv0/group/forUber/{uberID}")
     RawGroup.List getGroupsOfUberGroup(@Path("uberID") int uberId);
 
-    @GET("/room/list")
+    @GET("/APIv0/room/list")
     RawRoom.List getRooms();
 
-    @GET("/schedule/lesson/{ID}")
+    @GET("/APIv0/schedule/lesson/{ID}")
     RawCurriculaOfLesson getCurriculaForLesson(@Path("ID") int id);
 
-    @GET("/schedule/group/{ID}")
+    @GET("/APIv0/schedule/group/{ID}")
     RawScheduleOfGroup getScheduleOfGroup(@Path("ID") int id);
 
-    @GET("/schedule/teacher/{ID}")
+    @GET("/APIv0/schedule/teacher/{ID}")
     RawScheduleOfTeacher getScheduleOfTeacher(@Path("ID") int id);
 
-    @GET("/subject/list")
+    @GET("/APIv0/subject/list")
     RawSubject.List getSubjects();
 
-    @GET("/teacher/list")
+    @GET("/APIv0/teacher/list")
     RawTeacher.List getTeachers();
 
-    @GET("/time/week")
+    @GET("/APIv0/time/week")
     RawWeek getCurrentWeek();
 
-    @GET("/time/list")
+    @GET("/APIv0/time/list")
     RawTimeSlot.List getTimeSlots();
 }
