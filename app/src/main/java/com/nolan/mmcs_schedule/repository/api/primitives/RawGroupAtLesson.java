@@ -55,6 +55,7 @@ public class RawGroupAtLesson
             case BACHELOR: str = "Бак. "; break;
             case MASTER: str = "Маг. "; break;
             case SPECIALIST: str = "Спец. "; break;
+            case POSTGRADUATE: str = "Асп. "; break;
             default: throw new Error("unreachable statement");
         }
         if (!StringUtils.isEmpty(name)) {

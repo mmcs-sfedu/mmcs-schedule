@@ -20,7 +20,7 @@ import retrofit.http.Path;
  */
 public interface ScheduleApi {
 
-    @GET("/APIv0/grade/list")
+    @GET("/APIv1/grade/list")
     RawGrade.List getGrades();
 
     @GET("/APIv0/group/list/{gradeID}")
@@ -38,7 +38,7 @@ public interface ScheduleApi {
     @GET("/APIv0/schedule/group/{ID}")
     RawScheduleOfGroup getScheduleOfGroup(@Path("ID") int id);
 
-    @GET("/APIv0/schedule/teacher/{ID}")
+    @GET("/APIv1/schedule/teacher/{ID}")
     RawScheduleOfTeacher getScheduleOfTeacher(@Path("ID") int id);
 
     @GET("/APIv0/subject/list")

@@ -11,9 +11,10 @@ public class RawGrade
     public static class List extends ArrayList<RawGrade> { }
 
     public enum Degree {
-        @SerializedName("bachelor")   BACHELOR,
-        @SerializedName("master")     MASTER,
-        @SerializedName("specialist") SPECIALIST;
+        @SerializedName("bachelor")     BACHELOR,
+        @SerializedName("master")       MASTER,
+        @SerializedName("specialist")   SPECIALIST,
+        @SerializedName("postgraduate") POSTGRADUATE;
 
         @Override
         public String toString() {
@@ -21,6 +22,7 @@ public class RawGrade
                 case BACHELOR: return "Бакалавриат";
                 case MASTER: return "Магистратура";
                 case SPECIALIST: return "Специалитет";
+                case POSTGRADUATE: return "Аспирантура";
                 default: throw new Error("unreachable statement");
             }
         }

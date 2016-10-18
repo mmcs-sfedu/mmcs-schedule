@@ -115,6 +115,7 @@ public class PickSchedulePresenter {
                 case BACHELOR:   title = "Бак. ";  break;
                 case MASTER:     title = "Маг. ";  break;
                 case SPECIALIST: title = "Спец. "; break;
+                case POSTGRADUATE: title = "Асп. "; break;
                 default: throw new Error("unreachable statement");
             }
             if (null != pickedGroup.getName()) {

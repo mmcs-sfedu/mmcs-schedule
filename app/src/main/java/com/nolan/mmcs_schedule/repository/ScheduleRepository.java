@@ -10,20 +10,29 @@ import com.nolan.mmcs_schedule.repository.primitives.ScheduleOfGroup;
 import com.nolan.mmcs_schedule.repository.primitives.ScheduleOfTeacher;
 import com.nolan.mmcs_schedule.repository.primitives.Teacher;
 import com.nolan.mmcs_schedule.repository.primitives.WeekType;
-import com.nolan.mmcs_schedule.ui.schedule_activity.ScheduleActivity;
 import com.octo.android.robospice.SpiceManager;
 import com.octo.android.robospice.persistence.DurationInMillis;
 import com.octo.android.robospice.persistence.exception.SpiceException;
-import com.octo.android.robospice.request.SpiceRequest;
 import com.octo.android.robospice.request.listener.RequestListener;
 import com.octo.android.robospice.request.retrofit.RetrofitSpiceRequest;
 
 import java.util.Calendar;
 
+
+/**
+ * This class uses SpiceManager to perform network requests and caching.
+ */
 public class ScheduleRepository {
 
+    /**
+     * Expiry duration for all requests except week type request. Week type request is
+     * fresh until midnight.
+     */
     private static final long CACHE_EXPIRY_DURATION = DurationInMillis.ONE_DAY;
 
+    /**
+     * Whole job of performing requests and caching responses is delegated to this class.
+     */
     private SpiceManager spiceManager;
 
     public ScheduleRepository(SpiceManager spiceManager) {

@@ -7,6 +7,7 @@ import com.nolan.mmcs_schedule.utils.PrefUtils;
 import java.io.File;
 
 public class ScheduleApplication extends Application{
+    // Context that's available everywhere
     private static ScheduleApplication context;
 
     @Override
@@ -14,6 +15,8 @@ public class ScheduleApplication extends Application{
         super.onCreate();
         context = this;
 
+        // We should invalidate caches every time application updates.
+        // That's because their scheme can vary version by version.
         PrefUtils prefs = Injector.injectPreferences();
         if (prefs.getCacheVersion() != BuildConfig.VERSION_CODE) {
             prefs.setCacheVersion(BuildConfig.VERSION_CODE);
