@@ -1,7 +1,5 @@
 package com.nolan.mmcs_schedule.repository.primitives;
 
-import android.util.Log;
-
 import com.nolan.mmcs_schedule.repository.api.primitives.RawCurriculum;
 import com.nolan.mmcs_schedule.repository.api.primitives.RawLesson;
 import com.nolan.mmcs_schedule.repository.api.primitives.RawScheduleOfGroup;
@@ -40,6 +38,7 @@ public class ScheduleOfGroup {
         for (RawLesson rawLesson : rawScheduleOfGroup.getLessons()) {
             Map<String, List<RawCurriculum>> curriculaWithSameSubjectName
                     = lessonIdToCurricula.get(rawLesson.getId());
+            if (null == curriculaWithSameSubjectName) continue;
             for (Map.Entry<String, List<RawCurriculum>> entry
                     : curriculaWithSameSubjectName.entrySet()) {
                 List<RawCurriculum> curricula = entry.getValue();
