@@ -3,7 +3,9 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
+      <module fileurl="file://C:\Users\Nolan\StudioProjects\mmcs-schedule\app\app.iml" filepath="C:\Users\Nolan\StudioProjects\mmcs-schedule\app\app.iml" />
       <module fileurl="file://$PROJECT_DIR$/mmcs-schedule.iml" filepath="$PROJECT_DIR$/mmcs-schedule.iml" />
+      <module fileurl="file://C:\Users\Nolan\StudioProjects\mmcs-schedule\mmcs-schedule.iml" filepath="C:\Users\Nolan\StudioProjects\mmcs-schedule\mmcs-schedule.iml" />
     </modules>
   </component>
 </project>

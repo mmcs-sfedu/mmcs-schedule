@@ -167,7 +167,7 @@ public class ScheduleActivity extends BaseActivity
     @Override
     public void startReportErrorActivity(String subject, String text) {
         Intent emailIntent = new Intent(Intent.ACTION_SENDTO, Uri.fromParts(
-                "mailto", "yadummer+schedule@gmail.com", null));
+                "mailto", "mmcs.schedule.feedback@gmail.com", null));
         emailIntent.putExtra(Intent.EXTRA_SUBJECT, subject);
         emailIntent.putExtra(Intent.EXTRA_TEXT, text);
         startActivity(Intent.createChooser(emailIntent, "Отправить письмо..."));

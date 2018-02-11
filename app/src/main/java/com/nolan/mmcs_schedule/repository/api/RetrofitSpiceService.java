@@ -12,6 +12,6 @@ public class RetrofitSpiceService extends RetrofitGsonSpiceService {
 
     @Override
     protected String getServerUrl() {
-        return "http://users.mmcs.sfedu.ru:3000";
+        return "http://schedule.sfedu.ru";
     }
 }
